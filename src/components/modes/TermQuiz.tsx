@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import type { Term } from '../../types/index.ts'
 import { shuffle } from '../../utils/shuffle.ts'
 import MathDisplay from '../shared/MathDisplay.tsx'
@@ -8,6 +8,7 @@ import ProgressBar from '../layout/ProgressBar.tsx'
 
 interface TermQuizProps {
   terms: Term[];
+  onComplete?: (total: number, correct: number) => void;
 }
 
 interface Question extends Term {
@@ -24,7 +25,7 @@ function generateQuestions(termList: Term[]): Question[] {
   })
 }
 
-export default function TermQuiz({ terms }: TermQuizProps) {
+export default function TermQuiz({ terms, onComplete }: TermQuizProps) {
   const [questions, setQuestions] = useState(() => generateQuestions(terms))
   const [idx, setIdx] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
@@ -33,6 +34,14 @@ export default function TermQuiz({ terms }: TermQuizProps) {
   const current = questions[idx]
   const total = questions.length
   const done = idx >= total
+  const completedRef = useRef(false)
+
+  useEffect(() => {
+    if (done && !completedRef.current) {
+      completedRef.current = true
+      onComplete?.(total, score)
+    }
+  }, [done])
 
   const isCorrect = useMemo(() => {
     if (!selected || done) return false

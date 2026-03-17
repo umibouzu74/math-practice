@@ -33,7 +33,7 @@ body {
 }
 
 .katex { font-size: 1.15em; }
-.katex-display { margin: 0.6em 0; }
+.katex-display { margin: 0.6em 0; overflow-x: auto; overflow-y: hidden; }
 
 /* Header */
 .header {
@@ -151,12 +151,14 @@ body {
   width: 100%;
   min-height: 220px;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
 }
 .flashcard.flipped { transform: rotateY(180deg); }
 .flashcard-face {
   position: absolute;
   inset: 0;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   background: var(--bg-card);
   border-radius: 14px;
@@ -393,4 +395,8 @@ body {
   .tab { font-size: 0.72rem; padding: 0.5rem 0.3rem; }
   .main { padding: 0.75rem 1rem 3rem; }
   .card-body { padding: 1.1rem; }
+  .quiz-option { min-height: 44px; }
+  .rating-btn { min-height: 44px; }
+  .hint-btn { min-height: 44px; }
+  .next-btn { min-height: 44px; }
 }

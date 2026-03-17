@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import type { Pattern } from '../../types/index.ts'
 import { shuffle } from '../../utils/shuffle.ts'
 import MathDisplay from '../shared/MathDisplay.tsx'
@@ -8,6 +8,7 @@ import ProgressBar from '../layout/ProgressBar.tsx'
 
 interface PatternQuizProps {
   patterns: Pattern[];
+  onComplete?: (total: number, correct: number) => void;
 }
 
 interface Question extends Pattern {
@@ -21,7 +22,7 @@ function generateQuestions(patterns: Pattern[]): Question[] {
   }))
 }
 
-export default function PatternQuiz({ patterns }: PatternQuizProps) {
+export default function PatternQuiz({ patterns, onComplete }: PatternQuizProps) {
   const [questions, setQuestions] = useState(() => generateQuestions(patterns))
   const [idx, setIdx] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
@@ -30,6 +31,14 @@ export default function PatternQuiz({ patterns }: PatternQuizProps) {
   const current = questions[idx]
   const total = questions.length
   const done = idx >= total
+  const completedRef = useRef(false)
+
+  useEffect(() => {
+    if (done && !completedRef.current) {
+      completedRef.current = true
+      onComplete?.(total, score)
+    }
+  }, [done])
 
   const isCorrect = useMemo(() => {
     if (!selected || done) return false

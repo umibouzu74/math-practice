@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import type { Problem } from '../../types/index.ts'
 import MathDisplay from '../shared/MathDisplay.tsx'
 import RatingButtons from '../shared/RatingButtons.tsx'
@@ -7,9 +7,10 @@ import ProgressBar from '../layout/ProgressBar.tsx'
 
 interface PracticeProblemsProps {
   problems: Problem[];
+  onComplete?: (total: number, correct: number, ratings: { good: number; ok: number; bad: number }) => void;
 }
 
-export default function PracticeProblems({ problems }: PracticeProblemsProps) {
+export default function PracticeProblems({ problems, onComplete }: PracticeProblemsProps) {
   const [idx, setIdx] = useState(0)
   const [hintsShown, setHintsShown] = useState(0)
   const [showSolution, setShowSolution] = useState(false)
@@ -19,6 +20,14 @@ export default function PracticeProblems({ problems }: PracticeProblemsProps) {
   const total = problems.length
   const done = idx >= total
   const current = !done ? problems[idx] : null
+  const completedRef = useRef(false)
+
+  useEffect(() => {
+    if (done && !completedRef.current) {
+      completedRef.current = true
+      onComplete?.(total, ratings.good, ratings)
+    }
+  }, [done])
 
   const handleRate = useCallback((rating: 'good' | 'ok' | 'bad') => {
     setSelfRating(rating)
