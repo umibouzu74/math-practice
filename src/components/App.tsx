@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react'
 import type { Chapter, ChapterData, Mode } from '../types/index.ts'
 import Header from './layout/Header.tsx'
 import ModeTabs from './layout/ModeTabs.tsx'
+import FormulaCards from './modes/FormulaCards.tsx'
+import TermQuiz from './modes/TermQuiz.tsx'
 
 import chaptersJson from '../data/chapters.json'
 import polynomialJson from '../data/polynomial.json'
@@ -27,6 +29,27 @@ export default function App() {
     setChapterId(id)
   }
 
+  const renderMode = () => {
+    switch (mode) {
+      case 'formula':
+        return chapterData.formulas.length > 0
+          ? <FormulaCards key={`f-${chapterId}`} formulas={chapterData.formulas} />
+          : <EmptyState />
+      case 'term':
+        return chapterData.terms.length > 0
+          ? <TermQuiz key={`t-${chapterId}`} terms={chapterData.terms} />
+          : <EmptyState />
+      case 'pattern':
+        return chapterData.patterns.length > 0
+          ? <Placeholder label={`\u89E3\u6CD5\u30D1\u30BF\u30FC\u30F3\u5224\u5225\uFF08${chapterData.patterns.length}\u554F\uFF09`} icon="\u{1F9E9}" />
+          : <EmptyState />
+      case 'practice':
+        return chapterData.problems.length > 0
+          ? <Placeholder label={`\u7DF4\u7FD2\u554F\u984C\uFF08${chapterData.problems.length}\u554F\uFF09`} icon="\u270F\uFE0F" />
+          : <EmptyState />
+    }
+  }
+
   return (
     <div>
       <Header
@@ -36,33 +59,32 @@ export default function App() {
       />
       <ModeTabs activeMode={mode} onModeChange={setMode} />
       <main className="main">
-        <div className="fade-in" key={`${chapterId}-${mode}`}>
-          <div style={{
-            background: '#fff',
-            borderRadius: 14,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
-            border: '1px solid #e5e0d8',
-            padding: '3rem 2rem',
-            textAlign: 'center',
-          }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-              {mode === 'formula' && '\u{1F4D0}'}
-              {mode === 'term' && '\u{1F4D6}'}
-              {mode === 'pattern' && '\u{1F9E9}'}
-              {mode === 'practice' && '\u270F\uFE0F'}
-            </div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-              {mode === 'formula' && `公式フラッシュカード（${chapterData.formulas.length}枚）`}
-              {mode === 'term' && `用語クイズ（${chapterData.terms.length}問）`}
-              {mode === 'pattern' && `解法パターン判別（${chapterData.patterns.length}問）`}
-              {mode === 'practice' && `練習問題（${chapterData.problems.length}問）`}
-            </div>
-            <p style={{ color: '#6b7280', fontSize: '0.85rem' }}>
-              Step 3 以降で実装予定
-            </p>
-          </div>
-        </div>
+        {renderMode()}
       </main>
+    </div>
+  )
+}
+
+function EmptyState() {
+  return (
+    <div className="card fade-in">
+      <div className="complete-card">
+        <div className="complete-icon">{'\u{1F4DD}'}</div>
+        <div className="complete-title">{'\u6E96\u5099\u4E2D'}</div>
+        <p style={{ color: 'var(--ink-light)' }}>{'\u3053\u306E\u30C1\u30E3\u30D7\u30BF\u30FC\u306B\u306F\u307E\u3060\u30C7\u30FC\u30BF\u304C\u3042\u308A\u307E\u305B\u3093'}</p>
+      </div>
+    </div>
+  )
+}
+
+function Placeholder({ label, icon }: { label: string; icon: string }) {
+  return (
+    <div className="card fade-in">
+      <div className="complete-card">
+        <div className="complete-icon">{icon}</div>
+        <div className="complete-title">{label}</div>
+        <p style={{ color: 'var(--ink-light)' }}>Step 4 {'\u4EE5\u964D\u3067\u5B9F\u88C5\u4E88\u5B9A'}</p>
+      </div>
     </div>
   )
 }
