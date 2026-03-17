@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import type { Formula } from '../../types/index.ts'
 import { shuffle } from '../../utils/shuffle.ts'
 import MathDisplay from '../shared/MathDisplay.tsx'
@@ -8,11 +8,12 @@ import ProgressBar from '../layout/ProgressBar.tsx'
 
 interface FormulaCardsProps {
   formulas: Formula[];
+  onComplete?: (total: number, correct: number, ratings: { good: number; ok: number; bad: number }) => void;
 }
 
 type Rating = 'good' | 'ok' | 'bad'
 
-export default function FormulaCards({ formulas }: FormulaCardsProps) {
+export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps) {
   const [queue, setQueue] = useState(() => shuffle(formulas))
   const [idx, setIdx] = useState(0)
   const [flipped, setFlipped] = useState(false)
@@ -22,6 +23,14 @@ export default function FormulaCards({ formulas }: FormulaCardsProps) {
   const current = queue[idx]
   const total = queue.length
   const done = idx >= total
+  const completedRef = useRef(false)
+
+  useEffect(() => {
+    if (done && !completedRef.current) {
+      completedRef.current = true
+      onComplete?.(total, stats.good, stats)
+    }
+  }, [done])
 
   const handleRate = useCallback((rating: Rating) => {
     setStats(s => ({ ...s, [rating]: s[rating] + 1 }))

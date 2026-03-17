@@ -1,54 +1,65 @@
-<header>
+# 数学マスター - 数と式
 
-<!--
-  <<< Author notes: Course header >>>
-  Include a 1280×640 image, course title in sentence case, and a concise description in emphasis.
-  In your repository settings: enable template repository, add your 1280×640 social image, auto delete head branches.
-  Add your open source license, GitHub uses MIT license.
--->
+高校数学「数と式」分野の4モード学習アプリです。公式暗記・用語クイズ・解法パターン判別・練習問題の4つのモードで効率的に学習できます。
 
-# GitHub Pages
+## Demo
 
-_Create a site or blog from your GitHub repositories with GitHub Pages._
+https://umibouzu74.github.io/math-practice/
 
-</header>
+## 技術スタック
 
-<!--
-  <<< Author notes: Step 1 >>>
-  Choose 3-5 steps for your course.
-  The first step is always the hardest, so pick something easy!
-  Link to docs.github.com for further explanations.
-  Encourage users to open new tabs for steps!
--->
+- **Vite** - ビルドツール
+- **React** + **TypeScript** - UI フレームワーク
+- **Tailwind CSS** - スタイリング
+- **KaTeX** - 数式レンダリング
 
-## Step 1: Enable GitHub Pages
+## 学習モード
 
-_Welcome to GitHub Pages and Jekyll :tada:!_
+| モード | 内容 |
+|--------|------|
+| 📐 公式 | フラッシュカード形式で公式を暗記。タップで裏返し、○△×で自己評価 |
+| 📖 用語 | 4択クイズで数学用語と定義をマッチング |
+| 🧩 解法 | 問題を見て適切な解法パターンを4択から判別 |
+| ✏️ 演習 | 段階的ヒント付きの練習問題。解答後に自己評価 |
 
-The first step is to enable GitHub Pages on this [repository](https://docs.github.com/en/get-started/quickstart/github-glossary#repository). When you enable GitHub Pages on a repository, GitHub takes the content that's on the main branch and publishes a website based on its contents.
+## チャプター
 
-### :keyboard: Activity: Enable GitHub Pages
+1. 整式の計算・展開
+2. 因数分解
+3. 実数・平方根・対称式
+4. 方程式と不等式
 
-1. Open a new browser tab, and work on the steps in your second tab while you read the instructions in this tab.
-1. Under your repository name, click **Settings**.
-1. Click **Pages** in the **Code and automation** section.
-1. Ensure "Deploy from a branch" is selected from the **Source** drop-down menu, and then select `main` from the **Branch** drop-down menu.
-1. Click the **Save** button.
-1. Wait about _one minute_ then refresh this page (the one you're following instructions from). [GitHub Actions](https://docs.github.com/en/actions) will automatically update to the next step.
-   > Turning on GitHub Pages creates a deployment of your repository. GitHub Actions may take up to a minute to respond while waiting for the deployment. Future steps will be about 20 seconds; this step is slower.
-   > **Note**: In the **Pages** of **Settings**, the **Visit site** button will appear at the top. Click the button to see your GitHub Pages site.
+## データの追加方法
 
-<footer>
+`src/data/` ディレクトリに JSON ファイルを追加・編集してください。各ファイルは以下の構造に従います:
 
-<!--
-  <<< Author notes: Footer >>>
-  Add a link to get support, GitHub status page, code of conduct, license link.
--->
+```json
+{
+  "id": "chapter-id",
+  "formulas": [...],
+  "terms": [...],
+  "patterns": [...],
+  "problems": [...]
+}
+```
 
----
+型定義は `src/types/index.ts` を参照してください。
 
-Get help: [Post in our discussion board](https://github.com/orgs/skills/discussions/categories/github-pages) &bull; [Review the GitHub status page](https://www.githubstatus.com/)
+## ローカル開発
 
-&copy; 2023 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
+```bash
+npm install
+npm run dev
+```
 
-</footer>
+## ビルド
+
+```bash
+npm run build
+```
+
+`dist/` ディレクトリに静的ファイルが生成されます。
+
+## デプロイ
+
+GitHub Pages を使用。Settings → Pages → Source を「GitHub Actions」に設定してください。
