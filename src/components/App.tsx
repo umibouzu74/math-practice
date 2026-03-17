@@ -4,6 +4,8 @@ import Header from './layout/Header.tsx'
 import ModeTabs from './layout/ModeTabs.tsx'
 import FormulaCards from './modes/FormulaCards.tsx'
 import TermQuiz from './modes/TermQuiz.tsx'
+import PatternQuiz from './modes/PatternQuiz.tsx'
+import PracticeProblems from './modes/PracticeProblems.tsx'
 
 import chaptersJson from '../data/chapters.json'
 import polynomialJson from '../data/polynomial.json'
@@ -41,11 +43,11 @@ export default function App() {
           : <EmptyState />
       case 'pattern':
         return chapterData.patterns.length > 0
-          ? <Placeholder label={`\u89E3\u6CD5\u30D1\u30BF\u30FC\u30F3\u5224\u5225\uFF08${chapterData.patterns.length}\u554F\uFF09`} icon="\u{1F9E9}" />
+          ? <PatternQuiz key={`p-${chapterId}`} patterns={chapterData.patterns} />
           : <EmptyState />
       case 'practice':
         return chapterData.problems.length > 0
-          ? <Placeholder label={`\u7DF4\u7FD2\u554F\u984C\uFF08${chapterData.problems.length}\u554F\uFF09`} icon="\u270F\uFE0F" />
+          ? <PracticeProblems key={`pr-${chapterId}`} problems={chapterData.problems} />
           : <EmptyState />
     }
   }
@@ -77,14 +79,3 @@ function EmptyState() {
   )
 }
 
-function Placeholder({ label, icon }: { label: string; icon: string }) {
-  return (
-    <div className="card fade-in">
-      <div className="complete-card">
-        <div className="complete-icon">{icon}</div>
-        <div className="complete-title">{label}</div>
-        <p style={{ color: 'var(--ink-light)' }}>Step 4 {'\u4EE5\u964D\u3067\u5B9F\u88C5\u4E88\u5B9A'}</p>
-      </div>
-    </div>
-  )
-}
