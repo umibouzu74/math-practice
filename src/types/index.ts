@@ -48,7 +48,7 @@ export interface ChapterData {
 
 export interface StudyRecord {
   chapterId: string;
-  mode: 'formula' | 'term' | 'pattern' | 'practice';
+  mode: 'reference' | 'formula' | 'term' | 'pattern' | 'practice';
   date: string;
   total: number;
   correct: number;
@@ -59,4 +59,4 @@ export interface StudyRecord {
   };
 }
 
-export type Mode = 'formula' | 'term' | 'pattern' | 'practice';
+export type Mode = 'reference' | 'formula' | 'term' | 'pattern' | 'practice';

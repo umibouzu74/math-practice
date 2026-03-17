@@ -7,6 +7,7 @@ import FormulaCards from './modes/FormulaCards.tsx'
 import TermQuiz from './modes/TermQuiz.tsx'
 import PatternQuiz from './modes/PatternQuiz.tsx'
 import PracticeProblems from './modes/PracticeProblems.tsx'
+import ReferenceView from './modes/ReferenceView.tsx'
 
 import chaptersJson from '../data/chapters.json'
 import polynomialJson from '../data/polynomial.json'
@@ -24,7 +25,7 @@ const chapterDataMap: Record<string, ChapterData> = {
 
 export default function App() {
   const [chapterId, setChapterId] = useState(chapters[0].id)
-  const [mode, setMode] = useState<Mode>('formula')
+  const [mode, setMode] = useState<Mode>('reference')
   const [, setRecords] = useLocalStorage<StudyRecord[]>('math-master-records', [])
 
   const chapterData = useMemo(() => chapterDataMap[chapterId], [chapterId])
@@ -47,6 +48,13 @@ export default function App() {
 
   const renderMode = () => {
     switch (mode) {
+      case 'reference':
+        return <ReferenceView
+          key={`ref-${chapterId}`}
+          formulas={chapterData.formulas}
+          terms={chapterData.terms}
+          patterns={chapterData.patterns}
+        />
       case 'formula':
         return chapterData.formulas.length > 0
           ? <FormulaCards key={`f-${chapterId}`} formulas={chapterData.formulas}
