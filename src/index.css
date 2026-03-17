@@ -380,6 +380,106 @@ body {
 .complete-icon { font-size: 3rem; margin-bottom: 1rem; }
 .complete-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
 
+/* Reference View */
+.ref-section { margin-bottom: 1rem; overflow: hidden; }
+.ref-section-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--bg-card);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  transition: background 0.15s;
+}
+.ref-section-header:hover { background: #f8f6f2; }
+.ref-section-title { display: flex; align-items: center; gap: 0.5rem; }
+.ref-chevron {
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  transition: transform 0.2s;
+}
+.ref-chevron.open { transform: rotate(180deg); }
+.ref-section-body {
+  padding: 0 1.5rem 1.2rem;
+  animation: slideUp 0.2s ease;
+}
+.ref-group {
+  background: #faf8f5;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+.ref-group-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.ref-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.ref-item:last-child { border-bottom: none; }
+.ref-item-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+}
+.ref-item-formula { margin: 0.3rem 0; }
+.ref-item-note {
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  line-height: 1.5;
+  margin-top: 0.3rem;
+}
+.ref-item-example {
+  font-size: 0.8rem;
+  color: var(--ink-light);
+  margin-top: 0.3rem;
+  opacity: 0.8;
+}
+.ref-item-def {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.ref-item-problem {
+  text-align: center;
+  margin-bottom: 0.3rem;
+}
+.ref-item-prompt {
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  margin-bottom: 0.3rem;
+}
+.ref-item-correct {
+  font-weight: 700;
+  color: var(--accent2);
+  font-size: 0.92rem;
+  margin-bottom: 0.3rem;
+}
+.ref-item-explanation {
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.6;
+}
+.ref-empty {
+  text-align: center;
+  color: var(--ink-light);
+  padding: 1.5rem;
+  font-size: 0.88rem;
+}
+
 /* Animations */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(8px); }
