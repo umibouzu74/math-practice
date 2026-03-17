@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学マスター｜数と式</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f1eb;
+    --bg-card: #ffffff;
+    --ink: #1a1a2e;
+    --ink-light: #6b7280;
+    --accent: #c2410c;
+    --accent-light: #fed7aa;
+    --accent2: #1e40af;
+    --accent2-light: #dbeafe;
+    --success: #15803d;
+    --success-light: #dcfce7;
+    --error: #b91c1c;
+    --error-light: #fee2e2;
+    --border: #e5e0d8;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .katex { font-size: 1.15em; }
+  .katex-display { margin: 0.6em 0; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    padding: 1.2rem 1.5rem;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+  .header h1 {
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-size: 1.35rem; font-weight: 900;
+    letter-spacing: 0.04em;
+  }
+  .header h1 span { color: #f59e0b; }
+  .chapter-select {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .chapter-select option { color: #1a1a2e; background: #fff; }
+
+  /* Mode Tabs */
+  .tabs {
+    display: flex; gap: 2px;
+    background: #e8e3db;
+    padding: 3px;
+    border-radius: 10px;
+    margin: 1rem 1.5rem 0;
+  }
+  .tab {
+    flex: 1;
+    padding: 0.6rem 0.5rem;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+    color: var(--ink-light);
+    font-family: inherit;
+  }
+  .tab:hover { background: rgba(255,255,255,0.5); }
+  .tab.active {
+    background: var(--bg-card);
+    color: var(--ink);
+    font-weight: 700;
+    box-shadow: var(--shadow);
+  }
+  .tab-icon { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+
+  /* Main Content */
+  .main { max-width: 720px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+
+  /* Card */
+  .card {
+    background: var(--bg-card);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+  }
+  .card-body { padding: 1.5rem; }
+
+  /* Flashcard */
+  .flashcard-container {
+    perspective: 1000px;
+    min-height: 220px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+  }
+  .flashcard {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .flashcard-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    background: var(--bg-card);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+  .flashcard-back { transform: rotateY(180deg); }
+  .flashcard-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-light);
+    margin-bottom: 0.75rem;
+  }
+  .flashcard-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .flashcard-math { font-size: 1.2rem; }
+  .flashcard-note {
+    font-size: 0.8rem;
+    color: var(--ink-light);
+    margin-top: 0.75rem;
+    line-height: 1.5;
+  }
+  .tap-hint {
+    font-size: 0.72rem;
+    color: var(--ink-light);
+    margin-top: auto;
+    padding-top: 0.75rem;
+    opacity: 0.6;
+  }
+
+  /* Rating Buttons */
+  .rating-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+  .rating-btn {
+    flex: 1;
+    padding: 0.65rem;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--bg-card);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .rating-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+  .rating-btn.good { border-color: #86efac; color: var(--success); }
+  .rating-btn.good:hover { background: var(--success-light); }
+  .rating-btn.ok { border-color: #fde68a; color: #a16207; }
+  .rating-btn.ok:hover { background: #fef9c3; }
+  .rating-btn.bad { border-color: #fca5a5; color: var(--error); }
+  .rating-btn.bad:hover { background: var(--error-light); }
+
+  /* Progress */
+  .progress-bar-bg {
+    height: 6px; background: #e5e0d8; border-radius: 3px;
+    overflow: hidden; margin-bottom: 1rem;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), #7c3aed);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .progress-text {
+    font-size: 0.78rem; color: var(--ink-light);
+    display: flex; justify-content: space-between;
+    margin-bottom: 0.4rem;
+  }
+
+  /* Quiz */
+  .quiz-question {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 1.2rem;
+    padding: 1.2rem;
+    background: #f8f6f2;
+    border-radius: 10px;
+    border-left: 4px solid var(--accent2);
+  }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .quiz-option {
+    padding: 0.85rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    background: var(--bg-card);
+    font-family: inherit;
+    font-size: 0.9rem;
+    text-align: left;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .quiz-option:hover:not(.disabled) {
+    border-color: var(--accent2);
+    background: var(--accent2-light);
+  }
+  .quiz-option.correct {
+    border-color: var(--success);
+    background: var(--success-light);
+    font-weight: 600;
+  }
+  .quiz-option.wrong {
+    border-color: var(--error);
+    background: var(--error-light);
+  }
+  .quiz-option.disabled { cursor: default; opacity: 0.7; }
+  .option-marker {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #f3f0eb;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700; color: var(--ink-light);
+    flex-shrink: 0;
+  }
+
+  /* Explanation */
+  .explanation {
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    animation: slideUp 0.3s ease;
+  }
+  .explanation.correct-bg { background: var(--success-light); border: 1px solid #86efac; }
+  .explanation.wrong-bg { background: var(--error-light); border: 1px solid #fca5a5; }
+
+  /* Hints */
+  .hint-btn {
+    padding: 0.55rem 1.2rem;
+    border-radius: 8px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.15s;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .hint-btn:hover { background: var(--accent-light); }
+  .hint-btn.primary {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+  }
+  .hint-btn.primary:hover { background: #1e3a8a; }
+  .hint-box {
+    padding: 0.85rem 1rem;
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    animation: slideUp 0.25s ease;
+  }
+  .solution-box {
+    padding: 1rem 1.2rem;
+    background: var(--accent2-light);
+    border: 1px solid #93c5fd;
+    border-radius: 10px;
+    margin-top: 0.75rem;
+    animation: slideUp 0.3s ease;
+  }
+  .solution-step {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    font-size: 0.9rem;
+  }
+  .solution-step:last-child { border-bottom: none; }
+
+  /* Stats */
+  .stats-row {
+    display: flex; gap: 0.75rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .stat-chip {
+    padding: 0.45rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: flex; align-items: center; gap: 0.35rem;
+  }
+  .stat-chip.green { background: var(--success-light); color: var(--success); }
+  .stat-chip.yellow { background: #fef9c3; color: #a16207; }
+  .stat-chip.red { background: var(--error-light); color: var(--error); }
+  .stat-chip.blue { background: var(--accent2-light); color: var(--accent2); }
+
+  /* Next button */
+  .next-btn {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #1e40af, #7c3aed);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .next-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+
+  /* Category tag */
+  .category-tag {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #f3f0eb;
+    color: var(--ink-light);
+    margin-bottom: 0.5rem;
+  }
+
+  /* Empty / Complete */
+  .complete-card {
+    text-align: center;
+    padding: 3rem 2rem;
+  }
+  .complete-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .complete-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+
+  /* Animations */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: slideUp 0.35s ease; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .header { padding: 0.8rem 1rem; }
+    .header h1 { font-size: 1.1rem; }
+    .tabs { margin: 0.75rem 1rem 0; }
+    .tab { font-size: 0.72rem; padding: 0.5rem 0.3rem; }
+    .main { padding: 0.75rem 1rem 3rem; }
+    .card-body { padding: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// ============================================================
+// DATA - 数と式（整式の計算・因数分解・実数・方程式と不等式）
+// ============================================================
+const DATA = {
+  chapters: [
+    {
+      id: "polynomial",
+      name: "整式の計算・展開",
+      formulas: [
+        { id:"f1", name:"和の2乗", category:"展開公式[1]", formula:"(a+b)^2 = a^2 + 2ab + b^2", example:"(2x+3y)^2 = 4x^2+12xy+9y^2", note:"中学範囲の基本。2乗の係数に注意" },
+        { id:"f2", name:"差の2乗", category:"展開公式[1]", formula:"(a-b)^2 = a^2 - 2ab + b^2", example:"(2x-3y)^2 = 4x^2-12xy+9y^2", note:"符号ミスに注意。中間項は必ず負" },
+        { id:"f3", name:"和と差の積", category:"展開公式[2]", formula:"(a+b)(a-b) = a^2 - b^2", example:"(2x+3y)(2x-3y)=4x^2-9y^2", note:"最も簡潔な公式。展開の工夫で最優先" },
+        { id:"f4", name:"和の3乗", category:"展開公式[5]", formula:"(a+b)^3 = a^3 + 3a^2b + 3ab^2 + b^3", example:"(x+2)^3 = x^3+6x^2+12x+8", note:"パスカルの三角形：係数は 1,3,3,1" },
+        { id:"f5", name:"差の3乗", category:"展開公式[5]", formula:"(a-b)^3 = a^3 - 3a^2b + 3ab^2 - b^3", example:"(2x-3y)^3 = 8x^3-36x^2y+54xy^2-27y^3", note:"符号は +−+−  と交互になる" },
+        { id:"f6", name:"3項の2乗", category:"展開公式[7]", formula:"(a+b+c)^2 = a^2+b^2+c^2+2ab+2bc+2ca", example:"(3x+y+2z)^2=9x^2+y^2+4z^2+6xy+4yz+12zx", note:"(2乗の和)＋(全ての2文字の組の積の2倍の和)" },
+        { id:"f7", name:"3乗の和（因数分解型）", category:"展開公式[6]", formula:"(a+b)(a^2-ab+b^2) = a^3+b^3", example:"(x+2)(x^2-2x+4) = x^3+8", note:"1次式×2次式＝3次式。符号パターンに注意" },
+        { id:"f8", name:"3乗の差（因数分解型）", category:"展開公式[6]", formula:"(a-b)(a^2+ab+b^2) = a^3-b^3", example:"(2x-3y)(4x^2+6xy+9y^2)=8x^3-27y^3", note:"a²+ab+b² の符号は全て＋" },
+        { id:"f9", name:"3変数3乗の公式", category:"展開公式[8]", formula:"(a+b+c)(a^2+b^2+c^2-ab-bc-ca) = a^3+b^3+c^3-3abc", note:"最も覚えにくい公式の1つ。次数で覚える" },
+        { id:"f10", name:"指数法則[1]", category:"指数法則", formula:"a^m \\times a^n = a^{m+n}", example:"a^2 \\times a^3 = a^5", note:"aをm個とn個掛けたもの＝m+n個" },
+        { id:"f11", name:"指数法則[2]", category:"指数法則", formula:"(a^m)^n = a^{mn}", example:"(a^3)^2 = a^6", note:"aをm個掛けたものをn個掛ける＝mn個" },
+        { id:"f12", name:"指数法則[3]", category:"指数法則", formula:"(ab)^n = a^n b^n", example:"(ab)^3 = a^3 b^3", note:"abをn個掛けたもの＝aをn個×bをn個" },
+      ],
+      terms: [
+        { id:"t1", term:"単項式", definition:"数や文字をいくつか掛け合わせた式", example:"3x^2y" },
+        { id:"t2", term:"多項式", definition:"単項式の和で表される式", example:"2x^2-5x+6" },
+        { id:"t3", term:"整式", definition:"単項式と多項式を合わせた総称" },
+        { id:"t4", term:"係数", definition:"単項式において文字以外の部分。着目文字によって変化する", example:"-3x^2y \\text{ で } x \\text{ に着目} \\to \\text{係数は } {-3y}" },
+        { id:"t5", term:"次数", definition:"掛け合わせた文字の個数。着目文字によって変化する", example:"x^3y^2 \\text{ で全体の次数は } 5" },
+        { id:"t6", term:"定数項", definition:"着目した文字を含まない項", example:"x^2+y+2 \\text{ で } x \\text{ に着目} \\to \\text{定数項は } y+2" },
+        { id:"t7", term:"同類項", definition:"着目した文字の部分が同じ項。分配法則でまとめられる" },
+        { id:"t8", term:"降べきの順", definition:"項の次数が高い方から順に並べること。整式の整理の基本" },
+        { id:"t9", term:"展開", definition:"分配法則や指数法則を用いて整式の積を単項式の和にすること" },
+      ],
+      patterns: [
+        { id:"p1", problem:"(x+2y+1)(x+2y-3)", prompt:"この展開にはどの工夫が有効？", correct:"共通部分の置き換え", options:["そのまま分配法則","共通部分の置き換え","(a+b)(a-b)の公式","たすき掛け"], explanation:"x+2y が共通部分。A=x+2y とおくと (A+1)(A-3) に帰着" },
+        { id:"p2", problem:"(2x+y)(2x-y)(4x^2+y^2)(16x^4+y^4)", prompt:"この展開にはどの工夫が有効？", correct:"(a+b)(a-b)=a²-b² を繰り返す", options:["左から順に展開","(a+b)(a-b)=a²-b² を繰り返す","3乗の公式","共通部分の置き換え"], explanation:"(a+b)(a-b)=a²-b² が最も簡潔な公式なので最優先。繰り返し適用すると 256x⁸-y⁸" },
+        { id:"p3", problem:"(x+1)(x+2)(x+3)(x+4)", prompt:"4つの1次式の積。どう組み合わせる？", correct:"共通部分ができる組み合わせで計算", options:["左から順に展開","共通部分ができる組み合わせで計算","2つずつ展開してからたすき掛け","因数分解公式を利用"], explanation:"1+4=2+3=5 に着目。(x+1)(x+4)と(x+2)(x+3)を組み合わせると共通部分 x²+5x ができる" },
+      ],
+      problems: [
+        { id:"q1", problem:"(2x-3)(4x-5) \\text{ を展開せよ}", hints:["公式 (ax+b)(cx+d) = acx²+(ad+bc)x+bd の形","x の係数は（外側の積）＋（内側の積）"], solution:"8x^2-22x+15", steps:["2 \\cdot 4 \\cdot x^2 + \\{2 \\cdot(-5)+(-3) \\cdot 4\\}x+(-3)(-5)","= 8x^2-22x+15"] },
+        { id:"q2", problem:"(x+2)^3 \\text{ を展開せよ}", hints:["公式 (a+b)³ = a³+3a²b+3ab²+b³ を使う","a=x, b=2 として代入"], solution:"x^3+6x^2+12x+8", steps:["x^3+3 \\cdot x^2 \\cdot 2+3 \\cdot x \\cdot 2^2+2^3","= x^3+6x^2+12x+8"] },
+        { id:"q3", problem:"(x-2y-3z)^2 \\text{ を展開せよ}", hints:["3項の2乗の公式を使う","a=x, b=-2y, c=-3z とおく","(2乗の和)＋(2文字の組の積の2倍の和)"], solution:"x^2+4y^2+9z^2-4xy+12yz-6zx", steps:["x^2+(-2y)^2+(-3z)^2+2 \\cdot x(-2y)+2(-2y)(-3z)+2(-3z) \\cdot x","= x^2+4y^2+9z^2-4xy+12yz-6zx"] },
+      ]
+    },
+    {
+      id: "factoring",
+      name: "因数分解",
+      formulas: [
+        { id:"f20", name:"2乗の差", category:"因数分解公式[2]", formula:"a^2-b^2 = (a+b)(a-b)", note:"展開公式の逆。最も基本的" },
+        { id:"f21", name:"3乗の和", category:"因数分解公式[4]", formula:"a^3+b^3 = (a+b)(a^2-ab+b^2)", note:"a²-ab+b² はこれ以上因数分解できない" },
+        { id:"f22", name:"3乗の差", category:"因数分解公式[4]", formula:"a^3-b^3 = (a-b)(a^2+ab+b^2)", note:"a²+ab+b² の符号は全て＋" },
+        { id:"f23", name:"3変数3乗の因数分解", category:"因数分解公式", formula:"a^3+b^3+c^3-3abc = (a+b+c)(a^2+b^2+c^2-ab-bc-ca)", note:"暗記必須。a+b+c=0 なら a³+b³+c³=3abc" },
+        { id:"f24", name:"aⁿ-bⁿの一般化", category:"因数分解公式[5]", formula:"a^n-b^n = (a-b)(a^{n-1}+a^{n-2}b+\\cdots+ab^{n-2}+b^{n-1})", note:"nが偶数でも奇数でも成立" },
+      ],
+      terms: [
+        { id:"t20", term:"因数分解", definition:"整式を2つ以上の整式の積の形に変形すること（展開の逆）" },
+        { id:"t21", term:"たすき掛け", definition:"2次3項式 ax²+bx+c を因数分解するとき、積と和の条件を表にして整数 a,b,c,d を求める方法" },
+        { id:"t22", term:"共通因数", definition:"すべての項に共通する因数。因数分解で常に最優先でくくり出す" },
+        { id:"t23", term:"複2次式", definition:"x⁴+bx²+c のような、2乗の2次式。x²=A とおいて因数分解する" },
+      ],
+      patterns: [
+        { id:"p10", problem:"16x^2+58xy-24y^2", prompt:"この因数分解の最初の一手は？", correct:"共通因数2をくくり出す", options:["いきなりたすき掛け","共通因数2をくくり出す","公式 a²-b² を使う","最も次数が低い文字で整理"], explanation:"共通因数をくくり出すのが常に最優先！ 2(8x²+29xy-12y²) としてからたすき掛け" },
+        { id:"p11", problem:"10x^2-3z^2-5xy+yz+13zx", prompt:"複数の文字を含む因数分解。どうする？", correct:"最も次数が低い文字（y）で整理", options:["xで整理してたすき掛け","最も次数が低い文字（y）で整理","zで整理してたすき掛け","公式の形を探す"], explanation:"x,z は2次、y は1次。1次の y で整理すると、本質的に共通因数をくくり出すだけの問題になる" },
+        { id:"p12", problem:"x^4-14x^2+1", prompt:"この複2次式の因数分解法は？", correct:"(x²±○)²−(□x)² に変形して A²-B² 型", options:["x²=A とおいてたすき掛け","(x²±○)²−(□x)² に変形して A²-B² 型","公式 a⁴-b⁴ を使う","因数分解できない"], explanation:"たすき掛けできないので、(x²+1)²-16x² = (x²+4x+1)(x²-4x+1) と変形" },
+        { id:"p13", problem:"x^3+6x^2+12x+8", prompt:"この3次式の因数分解で気づくべきことは？", correct:"(a+b)³ の公式の形（x³と8=2³に着目）", options:["2項ずつ組み合わせて共通因数を探す","(a+b)³ の公式の形（x³と8=2³に着目）","因数定理を使う","たすき掛け"], explanation:"3次の項 x³ と定数項 8=2³ から公式の形を疑う → a=x, b=2 で (x+2)³" },
+      ],
+      problems: [
+        { id:"q10", problem:"2x^2+5x+3 \\text{ を因数分解せよ}", hints:["たすき掛けを使う","x²の係数2 = 1×2、定数項3 = 1×3","斜めの積の和が5になる組み合わせを探す"], solution:"(x+1)(2x+3)", steps:["\\text{たすき掛け: } 1 \\cdot 3 + 2 \\cdot 1 = 5 \\quad \\checkmark","(x+1)(2x+3)"] },
+        { id:"q11", problem:"x^3+64 \\text{ を因数分解せよ}", hints:["64 = 4³ だから a³+b³ の公式が使える","a=x, b=4 として公式適用"], solution:"(x+4)(x^2-4x+16)", steps:["x^3+4^3","= (x+4)(x^2-x \\cdot 4+4^2)","= (x+4)(x^2-4x+16)"] },
+        { id:"q12", problem:"4x^4-13x^2+3 \\text{ を因数分解せよ}", hints:["x²=A とおくと 4A²-13A+3","たすき掛けで因数分解","さらに因数分解できないか確認"], solution:"(2x+1)(2x-1)(x^2-3)", steps:["4(x^2)^2-13x^2+3","\\text{たすき掛け: } (4x^2-1)(x^2-3)","= (2x+1)(2x-1)(x^2-3)"] },
+      ]
+    },
+    {
+      id: "realnumbers",
+      name: "実数・平方根・対称式",
+      formulas: [
+        { id:"f30", name:"2乗の平方根", category:"平方根", formula:"\\sqrt{a^2} = |a|", note:"2乗の平方根は一旦絶対値をつけてはずす！" },
+        { id:"f31", name:"分母の有理化", category:"平方根", formula:"\\frac{1}{\\sqrt{a}\\pm\\sqrt{b}} = \\frac{\\sqrt{a}\\mp\\sqrt{b}}{a-b}", note:"(√a+√b)(√a-√b) = a-b を利用" },
+        { id:"f32", name:"2重根号", category:"平方根", formula:"\\sqrt{(a+b)\\pm 2\\sqrt{ab}} = \\sqrt{a}\\pm\\sqrt{b}", note:"和が○、積が△ となる a,b を探す" },
+        { id:"f33", name:"x²+y² の変形", category:"対称式", formula:"x^2+y^2 = (x+y)^2-2xy", note:"基本対称式 x+y, xy で表す超頻出公式" },
+        { id:"f34", name:"x³+y³ の変形", category:"対称式", formula:"x^3+y^3 = (x+y)^3-3xy(x+y)", note:"基本対称式で表す。暗記必須" },
+        { id:"f35", name:"x²+y²+z² の変形", category:"対称式", formula:"x^2+y^2+z^2 = (x+y+z)^2-2(xy+yz+zx)", note:"3変数の基本対称式で表す" },
+      ],
+      terms: [
+        { id:"t30", term:"平方根", definition:"正の数 a に対し、2乗すると a になる数。正の方を √a、負の方を -√a で表す" },
+        { id:"t31", term:"絶対値", definition:"数直線上で原点からの距離。|a|≧0 で、a≧0 のとき |a|=a、a<0 のとき |a|=-a" },
+        { id:"t32", term:"有理化", definition:"分母の根号をなくすこと。(√a+√b)(√a-√b)=a-b を利用" },
+        { id:"t33", term:"対称式", definition:"2つの変数を入れ替えても変わらない式。例: x²+xy+y²" },
+        { id:"t34", term:"交代式", definition:"2つの変数を入れ替えると符号が逆になる式。例: x³-y³" },
+        { id:"t35", term:"基本対称式", definition:"全ての対称式を表せる最小の対称式のセット。2変数: x+y, xy。3変数: x+y+z, xy+yz+zx, xyz" },
+        { id:"t36", term:"循環小数", definition:"同じ数字の並びが無限に繰り返される小数。例: 0.333...=0.\\dot{3}" },
+        { id:"t37", term:"整数部分と小数部分", definition:"(元の数)=(整数部分a)+(小数部分b) ただし 0≦b<1" },
+      ],
+      patterns: [
+        { id:"p20", problem:"\\sqrt{x^2-4x+4}+\\sqrt{9x^2+6x+1}", prompt:"この式を簡単にする最初の一手は？", correct:"因数分解して2乗の形にし、√a²=|a| を使う", options:["そのまま展開","因数分解して2乗の形にし、√a²=|a| を使う","二乗して根号をはずす","有理化する"], explanation:"x²-4x+4=(x-2)², 9x²+6x+1=(3x+1)² と因数分解。√a²=|a| で絶対値付きの式に帰着" },
+        { id:"p21", problem:"x+y=8,\\ xy=1 \\text{ のとき } x^3+y^3", prompt:"対称式の値を求める方法は？", correct:"公式 x³+y³=(x+y)³-3xy(x+y) に代入", options:["x, y を個別に求めてから代入","公式 x³+y³=(x+y)³-3xy(x+y) に代入","因数分解して (x+y)(x²-xy+y²)","展開して整理"], explanation:"基本対称式 x+y=8, xy=1 で表してから代入。8³-3·1·8=488" },
+      ],
+      problems: [
+        { id:"q20", problem:"3\\sqrt{7}-8 \\text{ の絶対値をはずせ}", hints:["3√7 と 8 の大小を比較する","√○ の形に揃える：3√7=√63, 8=√64","√63 < √64 だから 3√7-8 < 0"], solution:"8-3\\sqrt{7}", steps:["3\\sqrt{7}=\\sqrt{63},\\ 8=\\sqrt{64}","\\sqrt{63}<\\sqrt{64} \\text{ より } 3\\sqrt{7}-8<0","\\therefore |3\\sqrt{7}-8| = -(3\\sqrt{7}-8) = 8-3\\sqrt{7}"] },
+        { id:"q21", problem:"\\sqrt{5+2\\sqrt{6}} \\text{ の2重根号をはずせ}", hints:["根号の前を2にする（すでに2）","和が5、積が6となる自然数を探す","3+2=5, 3×2=6 → (√3+√2)²"], solution:"\\sqrt{3}+\\sqrt{2}", steps:["\\text{和が5, 積が6} \\to a=3,\\ b=2","\\sqrt{5+2\\sqrt{6}} = \\sqrt{(\\sqrt{3}+\\sqrt{2})^2} = \\sqrt{3}+\\sqrt{2}"] },
+      ]
+    },
+    {
+      id: "equations",
+      name: "方程式と不等式",
+      formulas: [
+        { id:"f40", name:"絶対値＝定数（瞬殺型）", category:"絶対値", formula:"a>0 \\text{ のとき } |X|=a \\iff X=\\pm a", note:"原点からの距離が a となる位置" },
+        { id:"f41", name:"絶対値＜定数（瞬殺型）", category:"絶対値", formula:"a>0 \\text{ のとき } |X|<a \\iff -a<X<a", note:"原点からの距離が a より近い範囲" },
+        { id:"f42", name:"絶対値＞定数（瞬殺型）", category:"絶対値", formula:"a>0 \\text{ のとき } |X|>a \\iff X<-a,\\ a<X", note:"原点からの距離が a より遠い範囲" },
+        { id:"f43", name:"|X|=|Y| の瞬殺", category:"絶対値", formula:"|X|=|Y| \\iff X=\\pm Y", note:"両辺2乗して X²=Y² → (X+Y)(X-Y)=0" },
+        { id:"f44", name:"不等式の性質（負を掛ける）", category:"不等式", formula:"a<b,\\ c<0 \\implies ac>bc", note:"負の数を掛けると不等号の向きが逆転！" },
+      ],
+      terms: [
+        { id:"t40", term:"1次不等式", definition:"x の1次式で表される不等式。1次方程式とほぼ同じだが、負で割ると不等号が逆転" },
+        { id:"t41", term:"連立不等式", definition:"複数の不等式を同時に満たす x の範囲。各不等式の共通範囲が解" },
+        { id:"t42", term:"文字係数の方程式", definition:"係数に文字を含む方程式。0で割れないため場合分けが必要" },
+      ],
+      patterns: [
+        { id:"p30", problem:"|x-1|=3-2x", prompt:"この絶対値付き方程式の解法は？", correct:"場合分けして絶対値をはずす", options:["瞬殺型：x-1=±(3-2x)","場合分けして絶対値をはずす","両辺2乗する","グラフで解く"], explanation:"右辺が正の定数ではないので瞬殺型ではない。x≧1 と x<1 で場合分け。裏技的に x-1=±(3-2x) かつ 3-2x≧0 でもOK" },
+        { id:"p31", problem:"ax>-1", prompt:"文字係数の不等式。何に注意する？", correct:"a の正・0・負で3通りに場合分け", options:["両辺を a で割って x>-1/a","a の正・0・負で3通りに場合分け","a≠0 と a=0 の2通りに場合分け","場合分け不要"], explanation:"方程式なら0か否かの2通りだが、不等式では正か0か負かの3通り。負で割ると不等号が逆転するため" },
+      ],
+      problems: [
+        { id:"q30", problem:"|2x-1| \\leq 5 \\text{ を解け}", hints:["右辺が正の定数 → 瞬殺型","| X | ≦ a ⟺ -a ≦ X ≦ a"], solution:"-2 \\leq x \\leq 3", steps:["-5 \\leq 2x-1 \\leq 5","-4 \\leq 2x \\leq 6","\\therefore -2 \\leq x \\leq 3"] },
+        { id:"q31", problem:"|1-x|+2|x+3| \\text{ の絶対値をはずせ（場合分け）}", hints:["中身=0 の点で数直線を分割","1-x=0 → x=1、x+3=0 → x=-3","x<-3, -3≦x≦1, 1<x の3つに場合分け","各場合で具体的な数値を代入して正負を判断"], solution:"\\text{3通りに場合分け}", steps:["1<x: \\quad (x-1)+2(x+3)=3x+5","-3 \\leq x \\leq 1: \\quad (1-x)+2(x+3)=x+7","x<-3: \\quad (1-x)-2(x+3)=-3x-5"] },
+      ]
+    }
+  ]
+};
+</script>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef, useMemo } = React;
+
+// ============================================================
+// KaTeX Rendering Helper
+// ============================================================
+function Math({ tex, display = false }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (ref.current && window.katex) {
+      try {
+        katex.render(tex, ref.current, {
+          displayMode: display,
+          throwOnError: false,
+          trust: true,
+        });
+      } catch (e) {
+        ref.current.textContent = tex;
+      }
+    }
+  }, [tex, display]);
+  return React.createElement(display ? 'div' : 'span', { ref, className: display ? 'katex-display' : '' });
+}
+
+// ============================================================
+// Shuffle utility
+// ============================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ============================================================
+// Formula Flashcards
+// ============================================================
+function FormulaCards({ formulas }) {
+  const [queue, setQueue] = useState(() => shuffle(formulas));
+  const [idx, setIdx] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [stats, setStats] = useState({ good: 0, ok: 0, bad: 0 });
+  const [retryQueue, setRetryQueue] = useState([]);
+
+  const current = queue[idx];
+  const total = queue.length;
+  const done = idx >= total;
+
+  const handleRate = (rating) => {
+    setStats(s => ({ ...s, [rating]: s[rating] + 1 }));
+    if (rating !== 'good') {
+      setRetryQueue(q => [...q, current]);
+    }
+    setFlipped(false);
+    setTimeout(() => setIdx(i => i + 1), 150);
+  };
+
+  const handleRetry = () => {
+    setQueue(shuffle(retryQueue));
+    setRetryQueue([]);
+    setIdx(0);
+    setStats({ good: 0, ok: 0, bad: 0 });
+  };
+
+  const handleReset = () => {
+    setQueue(shuffle(formulas));
+    setIdx(0);
+    setFlipped(false);
+    setStats({ good: 0, ok: 0, bad: 0 });
+    setRetryQueue([]);
+  };
+
+  if (done) {
+    return (
+      <div className="card fade-in">
+        <div className="complete-card">
+          <div className="complete-icon">🎯</div>
+          <div className="complete-title">1周完了！</div>
+          <div className="stats-row" style={{ justifyContent: 'center', marginTop: '1rem' }}>
+            <span className="stat-chip green">○ {stats.good}</span>
+            <span className="stat-chip yellow">△ {stats.ok}</span>
+            <span className="stat-chip red">× {stats.bad}</span>
+          </div>
+          {retryQueue.length > 0 && (
+            <button className="next-btn" onClick={handleRetry} style={{ maxWidth: 300, margin: '0.5rem auto' }}>
+              △×の {retryQueue.length} 枚を復習する
+            </button>
+          )}
+          <button className="hint-btn" onClick={handleReset} style={{ marginTop: '0.75rem' }}>
+            最初からやり直す
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fade-in">
+      <div className="progress-text">
+        <span>{current.category}</span>
+        <span>{idx + 1} / {total}</span>
+      </div>
+      <div className="progress-bar-bg">
+        <div className="progress-bar-fill" style={{ width: `${((idx) / total) * 100}%` }} />
+      </div>
+
+      <div className="flashcard-container" onClick={() => setFlipped(f => !f)}>
+        <div className={`flashcard ${flipped ? 'flipped' : ''}`}>
+          <div className="flashcard-face">
+            <div className="flashcard-label">公式名</div>
+            <div className="flashcard-title">{current.name}</div>
+            {current.example && (
+              <div style={{ marginTop: '0.5rem', opacity: 0.6, fontSize: '0.8rem' }}>
+                例: <Math tex={current.example} />
+              </div>
+            )}
+            <div className="tap-hint">タップで公式を表示</div>
+          </div>
+          <div className="flashcard-face flashcard-back">
+            <div className="flashcard-label">公式</div>
+            <div className="flashcard-math">
+              <Math tex={current.formula} display />
+            </div>
+            {current.note && <div className="flashcard-note">💡 {current.note}</div>}
+          </div>
+        </div>
+      </div>
+
+      {flipped && (
+        <div className="rating-row fade-in">
+          <button className="rating-btn good" onClick={() => handleRate('good')}>○ わかった</button>
+          <button className="rating-btn ok" onClick={() => handleRate('ok')}>△ あやしい</button>
+          <button className="rating-btn bad" onClick={() => handleRate('bad')}>× 忘れてた</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// Term Quiz
+// ============================================================
+function TermQuiz({ terms }) {
+  const [questions, setQuestions] = useState(() => generateQuestions(terms));
+  const [idx, setIdx] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [score, setScore] = useState(0);
+
+  function generateQuestions(termList) {
+    return shuffle(termList).map(t => {
+      const wrong = shuffle(termList.filter(x => x.id !== t.id)).slice(0, 3);
+      const options = shuffle([t, ...wrong]);
+      const showDef = Math.random() > 0.5;
+      return { ...t, options, showDef };
+    });
+  }
+
+  const current = questions[idx];
+  const total = questions.length;
+  const done = idx >= total;
+  const isCorrect = selected && selected === current.term;
+
+  const handleSelect = (opt) => {
+    if (selected) return;
+    setSelected(opt);
+    if (opt === current.term) setScore(s => s + 1);
+  };
+
+  const handleNext = () => {
+    setSelected(null);
+    setIdx(i => i + 1);
+  };
+
+  const handleReset = () => {
+    setQuestions(generateQuestions(terms));
+    setIdx(0);
+    setSelected(null);
+    setScore(0);
+  };
+
+  if (done) {
+    const pct = Math.round((score / total) * 100);
+    return (
+      <div className="card fade-in">
+        <div className="complete-card">
+          <div className="complete-icon">{pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚'}</div>
+          <div className="complete-title">{score} / {total} 正解（{pct}%）</div>
+          <button className="next-btn" onClick={handleReset} style={{ maxWidth: 300, margin: '1rem auto 0' }}>
+            もう一度チャレンジ
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const markers = ['ア', 'イ', 'ウ', 'エ'];
+
+  return (
+    <div className="fade-in">
+      <div className="progress-text">
+        <span className="stat-chip blue">正解 {score}/{idx}</span>
+        <span>{idx + 1} / {total}</span>
+      </div>
+      <div className="progress-bar-bg">
+        <div className="progress-bar-fill" style={{ width: `${(idx / total) * 100}%` }} />
+      </div>
+
+      <div className="card">
+        <div className="card-body">
+          {current.showDef ? (
+            <div className="quiz-question">
+              <div style={{ fontSize: '0.75rem', color: 'var(--ink-light)', marginBottom: '0.3rem' }}>次の説明に当てはまる用語は？</div>
+              <div style={{ fontWeight: 600 }}>{current.definition}</div>
+            </div>
+          ) : (
+            <div className="quiz-question">
+              <div style={{ fontSize: '0.75rem', color: 'var(--ink-light)', marginBottom: '0.3rem' }}>次の用語の意味は？</div>
+              <div style={{ fontWeight: 700, fontSize: '1.15rem' }}>{current.term}</div>
+            </div>
+          )}
+
+          <div className="quiz-options">
+            {current.options.map((opt, i) => {
+              const label = current.showDef ? opt.term : opt.definition;
+              const optKey = current.showDef ? opt.term : opt.definition;
+              const correctKey = current.showDef ? current.term : current.definition;
+              let cls = 'quiz-option';
+              if (selected) {
+                cls += ' disabled';
+                if ((current.showDef ? opt.term : opt.definition) === correctKey) cls += ' correct';
+                else if ((current.showDef ? opt.term : opt.definition) === (current.showDef ? selected : selected)) cls += ' wrong';
+              }
+              return (
+                <button
+                  key={i}
+                  className={cls}
+                  onClick={() => handleSelect(current.showDef ? opt.term : opt.definition)}
+                >
+                  <span className="option-marker">{markers[i]}</span>
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {selected && (
+            <div className={`explanation ${isCorrect ? 'correct-bg' : 'wrong-bg'}`}>
+              <strong>{isCorrect ? '正解！ ✓' : '不正解… ✗'}</strong>
+              <div style={{ marginTop: '0.3rem' }}>
+                <strong>{current.term}</strong>：{current.definition}
+              </div>
+              {current.example && (
+                <div style={{ marginTop: '0.3rem' }}>例: <Math tex={current.example} /></div>
+              )}
+            </div>
+          )}
+
+          {selected && <button className="next-btn" onClick={handleNext}>次の問題 →</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Pattern Quiz
+// ============================================================
+function PatternQuiz({ patterns }) {
+  const [queue, setQueue] = useState(() => shuffle(patterns));
+  const [idx, setIdx] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [score, setScore] = useState(0);
+
+  const current = queue[idx];
+  const total = queue.length;
+  const done = idx >= total;
+  const isCorrect = selected === current?.correct;
+
+  const handleSelect = (opt) => {
+    if (selected) return;
+    setSelected(opt);
+    if (opt === current.correct) setScore(s => s + 1);
+  };
+
+  const handleNext = () => {
+    setSelected(null);
+    setIdx(i => i + 1);
+  };
+
+  const handleReset = () => {
+    setQueue(shuffle(patterns));
+    setIdx(0);
+    setSelected(null);
+    setScore(0);
+  };
+
+  if (done) {
+    const pct = Math.round((score / total) * 100);
+    return (
+      <div className="card fade-in">
+        <div className="complete-card">
+          <div className="complete-icon">{pct >= 80 ? '🧠' : '💪'}</div>
+          <div className="complete-title">{score} / {total} 正解（{pct}%）</div>
+          <button className="next-btn" onClick={handleReset} style={{ maxWidth: 300, margin: '1rem auto 0' }}>
+            もう一度チャレンジ
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const markers = ['ア', 'イ', 'ウ', 'エ'];
+
+  return (
+    <div className="fade-in">
+      <div className="progress-text">
+        <span className="stat-chip blue">正解 {score}/{idx}</span>
+        <span>{idx + 1} / {total}</span>
+      </div>
+      <div className="progress-bar-bg">
+        <div className="progress-bar-fill" style={{ width: `${(idx / total) * 100}%` }} />
+      </div>
+
+      <div className="card">
+        <div className="card-body">
+          <div className="quiz-question">
+            <div style={{ fontSize: '0.75rem', color: 'var(--ink-light)', marginBottom: '0.5rem' }}>{current.prompt}</div>
+            <div style={{ textAlign: 'center' }}>
+              <Math tex={current.problem} display />
+            </div>
+          </div>
+
+          <div className="quiz-options">
+            {current.options.map((opt, i) => {
+              let cls = 'quiz-option';
+              if (selected) {
+                cls += ' disabled';
+                if (opt === current.correct) cls += ' correct';
+                else if (opt === selected) cls += ' wrong';
+              }
+              return (
+                <button key={i} className={cls} onClick={() => handleSelect(opt)}>
+                  <span className="option-marker">{markers[i]}</span>
+                  <span>{opt}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {selected && (
+            <div className={`explanation ${isCorrect ? 'correct-bg' : 'wrong-bg'}`}>
+              <strong>{isCorrect ? '正解！ ✓' : '不正解… ✗'}</strong>
+              <div style={{ marginTop: '0.4rem' }}>
+                <strong>正解：</strong>{current.correct}
+              </div>
+              <div style={{ marginTop: '0.3rem' }}>{current.explanation}</div>
+            </div>
+          )}
+
+          {selected && <button className="next-btn" onClick={handleNext}>次の問題 →</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Practice Problems
+// ============================================================
+function PracticeProblems({ problems }) {
+  const [idx, setIdx] = useState(0);
+  const [hintsShown, setHintsShown] = useState(0);
+  const [showSolution, setShowSolution] = useState(false);
+  const [selfRating, setSelfRating] = useState(null);
+
+  const current = problems[idx];
+  const total = problems.length;
+
+  const handleNext = () => {
+    setIdx(i => (i + 1) % total);
+    setHintsShown(0);
+    setShowSolution(false);
+    setSelfRating(null);
+  };
+
+  return (
+    <div className="fade-in">
+      <div className="progress-text">
+        <span>練習問題</span>
+        <span>{idx + 1} / {total}</span>
+      </div>
+
+      <div className="card">
+        <div className="card-body">
+          <div className="quiz-question" style={{ borderLeftColor: 'var(--accent)' }}>
+            <Math tex={current.problem} display />
+          </div>
+
+          {/* Hints */}
+          <div style={{ marginBottom: '1rem' }}>
+            {current.hints.map((hint, i) => (
+              <div key={i}>
+                {i < hintsShown && (
+                  <div className="hint-box fade-in" style={{ marginBottom: '0.5rem' }}>
+                    💡 ヒント{i + 1}：{hint}
+                  </div>
+                )}
+              </div>
+            ))}
+            {hintsShown < current.hints.length && !showSolution && (
+              <button className="hint-btn" onClick={() => setHintsShown(h => h + 1)}>
+                ヒント {hintsShown + 1} を見る
+              </button>
+            )}
+          </div>
+
+          {/* Solution */}
+          {!showSolution ? (
+            <button className="hint-btn primary" onClick={() => setShowSolution(true)}>
+              解答を見る
+            </button>
+          ) : (
+            <div className="solution-box fade-in">
+              <div style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--accent2)' }}>解答</div>
+              {current.steps.map((step, i) => (
+                <div key={i} className="solution-step">
+                  <Math tex={step} display />
+                </div>
+              ))}
+              <div style={{ marginTop: '0.75rem', padding: '0.6rem', background: '#f0f9ff', borderRadius: '6px', textAlign: 'center' }}>
+                <strong>答：</strong> <Math tex={current.solution} />
+              </div>
+            </div>
+          )}
+
+          {showSolution && !selfRating && (
+            <div style={{ marginTop: '1rem' }}>
+              <div style={{ fontSize: '0.82rem', color: 'var(--ink-light)', marginBottom: '0.5rem' }}>自己評価：</div>
+              <div className="rating-row">
+                <button className="rating-btn good" onClick={() => setSelfRating('good')}>○ 解けた</button>
+                <button className="rating-btn ok" onClick={() => setSelfRating('ok')}>△ 惜しい</button>
+                <button className="rating-btn bad" onClick={() => setSelfRating('bad')}>× 解けず</button>
+              </div>
+            </div>
+          )}
+
+          {selfRating && (
+            <button className="next-btn" onClick={handleNext}>次の問題 →</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Main App
+// ============================================================
+function App() {
+  const [chapterIdx, setChapterIdx] = useState(0);
+  const [mode, setMode] = useState('formula');
+
+  const chapters = DATA.chapters;
+  const chapter = chapters[chapterIdx];
+
+  const modes = [
+    { id: 'formula', icon: '📐', label: '公式' },
+    { id: 'term', icon: '📖', label: '用語' },
+    { id: 'pattern', icon: '🧩', label: '解法' },
+    { id: 'practice', icon: '✏️', label: '演習' },
+  ];
+
+  // Collect all data across chapters or just current
+  const allFormulas = chapter.formulas || [];
+  const allTerms = chapter.terms || [];
+  const allPatterns = chapter.patterns || [];
+  const allProblems = chapter.problems || [];
+
+  return (
+    <div>
+      <header className="header">
+        <div className="header-top">
+          <h1>数学<span>マスター</span></h1>
+          <select
+            className="chapter-select"
+            value={chapterIdx}
+            onChange={e => { setChapterIdx(Number(e.target.value)); }}
+          >
+            {chapters.map((ch, i) => (
+              <option key={ch.id} value={i}>{ch.name}</option>
+            ))}
+          </select>
+        </div>
+      </header>
+
+      <div className="tabs">
+        {modes.map(m => (
+          <button
+            key={m.id}
+            className={`tab ${mode === m.id ? 'active' : ''}`}
+            onClick={() => setMode(m.id)}
+          >
+            <span className="tab-icon">{m.icon}</span>
+            {m.label}
+          </button>
+        ))}
+      </div>
+
+      <main className="main">
+        {mode === 'formula' && allFormulas.length > 0 && (
+          <FormulaCards key={`f-${chapter.id}`} formulas={allFormulas} />
+        )}
+        {mode === 'term' && allTerms.length > 0 && (
+          <TermQuiz key={`t-${chapter.id}`} terms={allTerms} />
+        )}
+        {mode === 'pattern' && allPatterns.length > 0 && (
+          <PatternQuiz key={`p-${chapter.id}`} patterns={allPatterns} />
+        )}
+        {mode === 'practice' && allProblems.length > 0 && (
+          <PracticeProblems key={`q-${chapter.id}`} problems={allProblems} />
+        )}
+
+        {((mode === 'formula' && allFormulas.length === 0) ||
+          (mode === 'term' && allTerms.length === 0) ||
+          (mode === 'pattern' && allPatterns.length === 0) ||
+          (mode === 'practice' && allProblems.length === 0)) && (
+          <div className="card">
+            <div className="complete-card">
+              <div className="complete-icon">📝</div>
+              <div className="complete-title">準備中</div>
+              <p style={{ color: 'var(--ink-light)' }}>このチャプターにはまだデータがありません</p>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
