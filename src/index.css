@@ -1,0 +1,145 @@
+@import 'katex/dist/katex.min.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f5f1eb;
+  --bg-card: #ffffff;
+  --ink: #1a1a2e;
+  --ink-light: #6b7280;
+  --accent: #c2410c;
+  --accent-light: #fed7aa;
+  --accent2: #1e40af;
+  --accent2-light: #dbeafe;
+  --success: #15803d;
+  --success-light: #dcfce7;
+  --error: #b91c1c;
+  --error-light: #fee2e2;
+  --border: #e5e0d8;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.katex { font-size: 1.15em; }
+.katex-display { margin: 0.6em 0; }
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #fff;
+  padding: 1.2rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.header h1 {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+.header h1 span { color: #f59e0b; }
+.chapter-select {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+.chapter-select option { color: #1a1a2e; background: #fff; }
+
+/* Mode Tabs */
+.tabs {
+  display: flex;
+  gap: 2px;
+  background: #e8e3db;
+  padding: 3px;
+  border-radius: 10px;
+  margin: 1rem 1.5rem 0;
+}
+.tab {
+  flex: 1;
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  color: var(--ink-light);
+  font-family: inherit;
+}
+.tab:hover { background: rgba(255,255,255,0.5); }
+.tab.active {
+  background: var(--bg-card);
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+.tab-icon { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+
+/* Main Content */
+.main { max-width: 720px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+
+/* Progress */
+.progress-bar-bg {
+  height: 6px;
+  background: #e5e0d8;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), #7c3aed);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.progress-text {
+  font-size: 0.78rem;
+  color: var(--ink-light);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: slideUp 0.35s ease; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .header { padding: 0.8rem 1rem; }
+  .header h1 { font-size: 1.1rem; }
+  .tabs { margin: 0.75rem 1rem 0; }
+  .tab { font-size: 0.72rem; padding: 0.5rem 0.3rem; }
+  .main { padding: 0.75rem 1rem 3rem; }
+}
