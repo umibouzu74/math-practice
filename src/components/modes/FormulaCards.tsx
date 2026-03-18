@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, type TouchEvent as ReactTouchEvent } from 'react'
 import type { Formula } from '../../types/index.ts'
 import { shuffle } from '../../utils/shuffle.ts'
 import MathDisplay from '../shared/MathDisplay.tsx'
@@ -25,6 +25,37 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
   const total = queue.length
   const done = idx >= total
   const completedRef = useRef(false)
+
+  // Swipe handling
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+  const [swipeOffset, setSwipeOffset] = useState(0)
+
+  const handleTouchStart = useCallback((e: ReactTouchEvent) => {
+    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    setSwipeOffset(0)
+  }, [])
+
+  const handleTouchMove = useCallback((e: ReactTouchEvent) => {
+    if (!touchStartRef.current) return
+    const dx = e.touches[0].clientX - touchStartRef.current.x
+    const dy = e.touches[0].clientY - touchStartRef.current.y
+    // Only track horizontal swipe
+    if (Math.abs(dx) > Math.abs(dy)) {
+      setSwipeOffset(dx)
+    }
+  }, [])
+
+  const handleTouchEnd = useCallback(() => {
+    const threshold = 80
+    if (swipeOffset > threshold && idx > 0) {
+      // Swipe right → previous card
+      setFlipped(false)
+      setIdx(i => i - 1)
+    }
+    // Swipe left to skip is intentionally not provided to avoid accidental skips
+    setSwipeOffset(0)
+    touchStartRef.current = null
+  }, [swipeOffset, idx])
 
   useEffect(() => {
     if (done && !completedRef.current) {
@@ -122,8 +153,20 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
       </div>
       <ProgressBar current={idx + 1} total={total} label={current.category} />
 
-      <div className="flashcard-container" onClick={() => setFlipped(f => !f)} role="button" tabIndex={0} aria-label="公式カードをめくる">
-        <div className={`flashcard ${flipped ? 'flipped' : ''}`}>
+      <div
+        className="flashcard-container"
+        onClick={() => setFlipped(f => !f)}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        role="button"
+        tabIndex={0}
+        aria-label="公式カードをめくる（左右スワイプで移動）"
+      >
+        <div
+          className={`flashcard ${flipped ? 'flipped' : ''}`}
+          style={swipeOffset !== 0 ? { transform: `${flipped ? 'rotateY(180deg) ' : ''}translateX(${swipeOffset}px)`, transition: 'none' } : undefined}
+        >
           {/* Front */}
           <div className="flashcard-face">
             <div className="flashcard-label">{'\u516C\u5F0F\u540D'}</div>
@@ -133,7 +176,7 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
                 {'\u4F8B'}: <MathDisplay tex={current.example} />
               </div>
             )}
-            <div className="tap-hint">{'タップ or スペースキーで公式を表示'}</div>
+            <div className="tap-hint">{'タップで公式を表示 ｜ ← スワイプで戻る'}</div>
           </div>
           {/* Back */}
           <div className="flashcard-face flashcard-back">

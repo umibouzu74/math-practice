@@ -27,7 +27,7 @@ export default function ModeTabs({ activeMode, onModeChange }: ModeTabsProps) {
           aria-label={`${m.label}モード`}
         >
           <span className="tab-icon">{m.icon}</span>
-          {m.label}
+          <span className="tab-label">{m.label}</span>
         </button>
       ))}
     </nav>
