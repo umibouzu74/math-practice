@@ -9,11 +9,13 @@ import ProgressBar from '../layout/ProgressBar.tsx'
 interface FormulaCardsProps {
   formulas: Formula[];
   onComplete?: (total: number, correct: number, ratings: { good: number; ok: number; bad: number }) => void;
+  onMistake?: (itemId: string) => void;
+  onCorrect?: (itemId: string) => void;
 }
 
 type Rating = 'good' | 'ok' | 'bad'
 
-export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps) {
+export default function FormulaCards({ formulas, onComplete, onMistake, onCorrect }: FormulaCardsProps) {
   const [isShuffled, setIsShuffled] = useState(true)
   const [queue, setQueue] = useState(() => shuffle(formulas))
   const [idx, setIdx] = useState(0)
@@ -69,12 +71,15 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
 
   const handleRate = useCallback((rating: Rating) => {
     setStats(s => ({ ...s, [rating]: s[rating] + 1 }))
-    if (rating !== 'good') {
+    if (rating === 'good') {
+      onCorrect?.(current.id)
+    } else {
+      onMistake?.(current.id)
       setRetryQueue(q => [...q, current])
     }
     setFlipped(false)
     setTimeout(() => setIdx(i => i + 1), 150)
-  }, [current])
+  }, [current, onMistake, onCorrect])
 
   const handleRetry = useCallback(() => {
     setQueue(shuffle(retryQueue))

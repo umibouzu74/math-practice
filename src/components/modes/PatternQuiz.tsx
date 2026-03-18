@@ -9,6 +9,8 @@ import ProgressBar from '../layout/ProgressBar.tsx'
 interface PatternQuizProps {
   patterns: Pattern[];
   onComplete?: (total: number, correct: number) => void;
+  onMistake?: (itemId: string) => void;
+  onCorrect?: (itemId: string) => void;
 }
 
 interface Question extends Pattern {
@@ -23,7 +25,7 @@ function generateQuestions(patterns: Pattern[], shouldShuffle: boolean): Questio
   }))
 }
 
-export default function PatternQuiz({ patterns, onComplete }: PatternQuizProps) {
+export default function PatternQuiz({ patterns, onComplete, onMistake, onCorrect }: PatternQuizProps) {
   const [isShuffled, setIsShuffled] = useState(true)
   const [questions, setQuestions] = useState(() => generateQuestions(patterns, true))
   const [idx, setIdx] = useState(0)
@@ -53,7 +55,9 @@ export default function PatternQuiz({ patterns, onComplete }: PatternQuizProps) 
     setSelected(opt)
     if (opt === current.correct) {
       setScore(s => s + 1)
+      onCorrect?.(current.id)
     } else {
+      onMistake?.(current.id)
       setWrongPatterns(prev => {
         if (prev.some(p => p.id === current.id)) return prev
         return [...prev, current as Pattern]

@@ -8,9 +8,11 @@ import ProgressBar from '../layout/ProgressBar.tsx'
 interface PracticeProblemsProps {
   problems: Problem[];
   onComplete?: (total: number, correct: number, ratings: { good: number; ok: number; bad: number }) => void;
+  onMistake?: (itemId: string) => void;
+  onCorrect?: (itemId: string) => void;
 }
 
-export default function PracticeProblems({ problems, onComplete }: PracticeProblemsProps) {
+export default function PracticeProblems({ problems, onComplete, onMistake, onCorrect }: PracticeProblemsProps) {
   const [idx, setIdx] = useState(0)
   const [hintsShown, setHintsShown] = useState(0)
   const [showSolution, setShowSolution] = useState(false)
@@ -32,7 +34,14 @@ export default function PracticeProblems({ problems, onComplete }: PracticeProbl
   const handleRate = useCallback((rating: 'good' | 'ok' | 'bad') => {
     setSelfRating(rating)
     setRatings(r => ({ ...r, [rating]: r[rating] + 1 }))
-  }, [])
+    if (current) {
+      if (rating === 'good') {
+        onCorrect?.(current.id)
+      } else {
+        onMistake?.(current.id)
+      }
+    }
+  }, [current, onMistake, onCorrect])
 
   const handleNext = useCallback(() => {
     setIdx(i => i + 1)
