@@ -33,7 +33,13 @@ body {
 }
 
 .katex { font-size: 1.15em; }
-.katex-display { margin: 0.6em 0; overflow-x: auto; overflow-y: hidden; }
+.katex-display {
+  margin: 0.6em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.25em 0;
+}
 
 /* Header */
 .header {
@@ -170,10 +176,14 @@ body {
   padding: 3px;
   border-radius: 10px;
   margin: 1rem 1.5rem 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.tabs::-webkit-scrollbar { display: none; }
 .tab {
-  flex: 1;
-  padding: 0.6rem 0.5rem;
+  flex: 1 0 auto;
+  padding: 0.6rem 0.75rem;
   text-align: center;
   border-radius: 8px;
   cursor: pointer;
@@ -184,8 +194,11 @@ body {
   background: transparent;
   color: var(--ink-light);
   font-family: inherit;
+  white-space: nowrap;
+  min-width: 0;
 }
 .tab:hover { background: rgba(255,255,255,0.5); }
+.tab:active { transform: scale(0.95); }
 .tab.active {
   background: var(--bg-card);
   color: var(--ink);
@@ -326,7 +339,7 @@ body {
   border-radius: 10px;
   border-left: 4px solid var(--accent2);
 }
-.quiz-options { display: flex; flex-direction: column; gap: 0.65rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.75rem; }
 .quiz-option {
   padding: 0.95rem 1rem;
   border: 2px solid var(--border);
@@ -424,6 +437,7 @@ body {
   transition: all 0.2s;
 }
 .next-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.next-btn:active { transform: scale(0.97); }
 
 .hint-btn {
   padding: 0.55rem 1.2rem;
@@ -703,9 +717,10 @@ body {
 /* Responsive: Tablet */
 @media (max-width: 768px) {
   .main { padding: 0.85rem 1.2rem 3rem; }
-  .tab { font-size: 0.78rem; padding: 0.55rem 0.4rem; }
+  .tab { font-size: 0.78rem; padding: 0.55rem 0.5rem; }
   .tab-icon { font-size: 1.15rem; }
   .rating-row { position: sticky; bottom: 0; z-index: 50; background: var(--bg); padding: 0.75rem 0; margin: 0 -0.25rem; }
+  .katex { font-size: 1.2em; }
 }
 
 /* Responsive: Smartphone */
@@ -714,14 +729,15 @@ body {
   .header h1 { font-size: 1.1rem; }
   .tabs { margin: 0.75rem 0.75rem 0; gap: 1px; padding: 2px; }
   .tab {
-    font-size: 0.7rem;
-    padding: 0.55rem 0.2rem;
+    font-size: 0.72rem;
+    padding: 0.55rem 0.5rem;
   }
   .tab-icon { font-size: 1.3rem; margin-bottom: 1px; }
-  .tab-label { font-size: 0.62rem; }
+  .tab-label { font-size: 0.65rem; }
   .main { padding: 0.75rem 0.85rem 3rem; }
   .card-body { padding: 1.1rem; }
-  .quiz-option { min-height: 52px; font-size: 0.88rem; }
+  .quiz-option { min-height: 52px; font-size: 0.88rem; padding: 1rem; }
+  .quiz-options { gap: 0.85rem; }
   .rating-btn { min-height: 52px; font-size: 0.9rem; }
   .hint-btn { min-height: 48px; }
   .next-btn { min-height: 48px; font-size: 0.95rem; }
@@ -730,12 +746,16 @@ body {
   .flashcard-face { padding: 1.5rem; }
   .option-key-hint { display: none; }
   .rating-key-hint { display: none; }
+  .katex { font-size: 1.25em; }
+  body { line-height: 1.8; }
+  .explanation { line-height: 1.8; }
+  .ref-item-def { line-height: 1.8; }
 }
 
 /* Very small phones */
 @media (max-width: 380px) {
   .tab-label { display: none; }
-  .tab { padding: 0.6rem 0.3rem; }
+  .tab { padding: 0.6rem 0.5rem; }
   .tab-icon { font-size: 1.4rem; margin-bottom: 0; }
   .header h1 { font-size: 1rem; }
   .chapter-select-btn { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
