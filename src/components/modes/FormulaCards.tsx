@@ -74,7 +74,7 @@ export default function FormulaCards({ formulas, onComplete, onMistake, onCorrec
       completedRef.current = true
       onComplete?.(total, stats.good, stats)
     }
-  }, [done])
+  }, [done, onComplete, total, stats])
 
   const handleRate = useCallback((rating: Rating) => {
     setStats(s => ({ ...s, [rating]: s[rating] + 1 }))

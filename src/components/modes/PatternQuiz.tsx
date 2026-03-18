@@ -43,7 +43,7 @@ export default function PatternQuiz({ patterns, onComplete, onMistake, onCorrect
       completedRef.current = true
       onComplete?.(total, score)
     }
-  }, [done])
+  }, [done, onComplete, total, score])
 
   const isCorrect = useMemo(() => {
     if (!selected || done) return false
@@ -63,7 +63,7 @@ export default function PatternQuiz({ patterns, onComplete, onMistake, onCorrect
         return [...prev, current as Pattern]
       })
     }
-  }, [selected, current])
+  }, [selected, current, onCorrect, onMistake])
 
   const handleNext = useCallback(() => {
     setSelected(null)
