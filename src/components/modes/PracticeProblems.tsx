@@ -110,7 +110,7 @@ export default function PracticeProblems({ problems, onComplete }: PracticeProbl
                   <MathDisplay tex={step} display />
                 </div>
               ))}
-              <div style={{ marginTop: '0.75rem', padding: '0.6rem', background: '#f0f9ff', borderRadius: '6px', textAlign: 'center' }}>
+              <div style={{ marginTop: '0.75rem', padding: '0.6rem', background: 'var(--accent2-light)', borderRadius: '6px', textAlign: 'center' }}>
                 <strong>{'答：'}</strong> <MathDisplay tex={current!.solution} />
               </div>
             </div>

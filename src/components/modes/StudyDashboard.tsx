@@ -120,7 +120,7 @@ export default function StudyDashboard({ records, chapters, currentChapterId, on
                         <span>
                           <span style={{ color: 'var(--success)' }}>{'○'}{r.ratings.good}</span>
                           {' '}
-                          <span style={{ color: '#a16207' }}>{'△'}{r.ratings.ok}</span>
+                          <span style={{ color: 'var(--accent)' }}>{'△'}{r.ratings.ok}</span>
                           {' '}
                           <span style={{ color: 'var(--error)' }}>{'×'}{r.ratings.bad}</span>
                         </span>

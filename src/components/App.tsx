@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import type { Chapter, ChapterData, Mode, StudyRecord } from '../types/index.ts'
 import useLocalStorage from '../hooks/useLocalStorage.ts'
 import Header from './layout/Header.tsx'
@@ -28,6 +28,12 @@ export default function App() {
   const [chapterId, setChapterId] = useState(chapters[0].id)
   const [mode, setMode] = useState<Mode>('reference')
   const [records, setRecords] = useLocalStorage<StudyRecord[]>('math-master-records', [])
+  const mainRef = useRef<HTMLElement>(null)
+
+  const handleModeChange = useCallback((newMode: Mode) => {
+    setMode(newMode)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   const chapterData = useMemo(() => chapterDataMap[chapterId], [chapterId])
 
@@ -94,8 +100,8 @@ export default function App() {
         selectedChapterId={chapterId}
         onChapterChange={handleChapterChange}
       />
-      <ModeTabs activeMode={mode} onModeChange={setMode} />
-      <main className="main">
+      <ModeTabs activeMode={mode} onModeChange={handleModeChange} />
+      <main className="main" ref={mainRef}>
         {renderMode()}
       </main>
     </div>

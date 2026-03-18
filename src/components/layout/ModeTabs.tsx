@@ -1,3 +1,4 @@
+import { useRef, useEffect, useCallback } from 'react'
 import type { Mode } from '../../types/index.ts'
 
 const modes: { id: Mode; icon: string; label: string }[] = [
@@ -15,13 +16,24 @@ interface ModeTabsProps {
 }
 
 export default function ModeTabs({ activeMode, onModeChange }: ModeTabsProps) {
+  const activeRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+  }, [activeMode])
+
+  const handleModeChange = useCallback((mode: Mode) => {
+    onModeChange(mode)
+  }, [onModeChange])
+
   return (
     <nav className="tabs" role="tablist" aria-label="学習モード">
       {modes.map((m) => (
         <button
           key={m.id}
+          ref={activeMode === m.id ? activeRef : undefined}
           className={`tab ${activeMode === m.id ? 'active' : ''}`}
-          onClick={() => onModeChange(m.id)}
+          onClick={() => handleModeChange(m.id)}
           role="tab"
           aria-selected={activeMode === m.id}
           aria-label={`${m.label}モード`}
