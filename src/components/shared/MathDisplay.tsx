@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, memo } from 'react'
 import katex from 'katex'
 
 interface MathDisplayProps {
@@ -6,7 +6,7 @@ interface MathDisplayProps {
   display?: boolean;
 }
 
-export default function MathDisplay({ tex, display = false }: MathDisplayProps) {
+export default memo(function MathDisplay({ tex, display = false }: MathDisplayProps) {
   const ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -27,4 +27,4 @@ export default function MathDisplay({ tex, display = false }: MathDisplayProps) 
     return <div ref={ref as React.RefObject<HTMLDivElement>} className="katex-display" />
   }
   return <span ref={ref as React.RefObject<HTMLSpanElement>} />
-}
+})

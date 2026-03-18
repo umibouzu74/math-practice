@@ -43,9 +43,16 @@ export default function FormulaCards({ formulas, onComplete, onMistake, onCorrec
     const dy = e.touches[0].clientY - touchStartRef.current.y
     // Only track horizontal swipe
     if (Math.abs(dx) > Math.abs(dy)) {
-      setSwipeOffset(dx)
+      // Suppress drag at boundaries (first card can't go right, unflipped can't go left)
+      if (dx > 0 && idx === 0) {
+        setSwipeOffset(dx * 0.2) // dampened feedback
+      } else if (dx < 0 && !flipped) {
+        setSwipeOffset(dx * 0.2) // dampened feedback
+      } else {
+        setSwipeOffset(dx)
+      }
     }
-  }, [])
+  }, [idx, flipped])
 
   const handleTouchEnd = useCallback(() => {
     const threshold = 80

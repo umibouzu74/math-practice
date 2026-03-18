@@ -89,7 +89,7 @@ export default function App() {
   const renderRefToggle = () => (
     <button
       className="ref-toggle-btn"
-      onClick={() => { setShowRef(r => !r); if (!showRef) window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+      onClick={() => { setShowRef(r => !r); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
     >
       {showRef ? '学習に戻る' : '一覧を見る'}
     </button>
