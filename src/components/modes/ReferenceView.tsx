@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import type { Formula, Term, Pattern } from '../../types/index.ts'
+import type { Formula, Term, Pattern, Problem } from '../../types/index.ts'
 import MathDisplay from '../shared/MathDisplay.tsx'
 
 interface ReferenceViewProps {
   formulas: Formula[]
   terms: Term[]
   patterns: Pattern[]
+  problems: Problem[]
 }
 
 function AccordionSection({
@@ -44,7 +45,48 @@ function groupByCategory(formulas: Formula[]): Record<string, Formula[]> {
   return groups
 }
 
-export default function ReferenceView({ formulas, terms, patterns }: ReferenceViewProps) {
+function ExpandableSolution({ problem }: { problem: Problem }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="ref-item">
+      <div className="ref-item-problem">
+        <MathDisplay tex={problem.problem} display />
+      </div>
+      <button
+        className="ref-solution-toggle"
+        onClick={() => setOpen(o => !o)}
+      >
+        {open ? '解答を閉じる ▲' : '解答を見る ▼'}
+      </button>
+      {open && (
+        <div className="ref-solution-detail fade-in">
+          {problem.hints.length > 0 && (
+            <div className="ref-solution-hints">
+              {problem.hints.map((hint, i) => (
+                <div key={i} className="ref-solution-hint">
+                  {'💡 ヒント'}{i + 1}{'：'}<MathDisplay tex={hint} />
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="ref-solution-steps">
+            {problem.steps.map((step, i) => (
+              <div key={i} className="solution-step">
+                <MathDisplay tex={step} display />
+              </div>
+            ))}
+          </div>
+          <div className="ref-solution-answer">
+            <strong>{'答：'}</strong> <MathDisplay tex={problem.solution} />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function ReferenceView({ formulas, terms, patterns, problems }: ReferenceViewProps) {
   const formulaGroups = groupByCategory(formulas)
 
   return (
@@ -108,6 +150,16 @@ export default function ReferenceView({ formulas, terms, patterns }: ReferenceVi
           </div>
         ))}
         {patterns.length === 0 && (
+          <div className="ref-empty">データがありません</div>
+        )}
+      </AccordionSection>
+
+      {/* Section 4: 練習問題一覧 */}
+      <AccordionSection icon={'\u270F\uFE0F'} title="練習問題一覧" defaultOpen={false}>
+        {problems.map(p => (
+          <ExpandableSolution key={p.id} problem={p} />
+        ))}
+        {problems.length === 0 && (
           <div className="ref-empty">データがありません</div>
         )}
       </AccordionSection>
