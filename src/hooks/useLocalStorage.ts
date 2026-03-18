@@ -4,8 +4,10 @@ export default function useLocalStorage<T>(key: string, initialValue: T): [T, (v
   const [stored, setStored] = useState<T>(() => {
     try {
       const item = localStorage.getItem(key)
-      return item ? JSON.parse(item) : initialValue
-    } catch {
+      if (item === null) return initialValue
+      return JSON.parse(item) as T
+    } catch (e) {
+      console.warn(`[useLocalStorage] Failed to read key "${key}":`, e)
       return initialValue
     }
   })
@@ -15,7 +17,9 @@ export default function useLocalStorage<T>(key: string, initialValue: T): [T, (v
       const next = value instanceof Function ? value(prev) : value
       try {
         localStorage.setItem(key, JSON.stringify(next))
-      } catch { /* quota exceeded - ignore */ }
+      } catch (e) {
+        console.warn(`[useLocalStorage] Failed to write key "${key}":`, e)
+      }
       return next
     })
   }, [key])

@@ -105,9 +105,9 @@ export default function CrossReview({ chapterDataMap, chapters, onSaveMistake, o
     setIdx(nextIdx)
     if (nextIdx >= total && !completed) {
       setCompleted(true)
-      onComplete?.(total, score + (isCorrect ? 0 : 0))
+      onComplete?.(total, score)
     }
-  }, [idx, total, completed, onComplete, score, isCorrect])
+  }, [idx, total, completed, onComplete, score])
 
   const handleReset = useCallback(() => {
     setQuestions(buildQuestions(chapterDataMap, chapters))

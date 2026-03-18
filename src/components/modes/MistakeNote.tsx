@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import type { MistakeEntry, ChapterData, Term, Pattern } from '../../types/index.ts'
 import { shuffle } from '../../utils/shuffle.ts'
 import MathDisplay from '../shared/MathDisplay.tsx'
@@ -184,6 +184,33 @@ function TermDrill({ terms, allTerms, onBack, onCorrect, onMistake }: TermDrillP
     }
   }, [selected, current, onCorrect, onMistake])
 
+  const handleNext = useCallback(() => {
+    setSelected(null)
+    setIdx(i => i + 1)
+  }, [])
+
+  // Keyboard shortcuts: 1-4 to select, Enter/Space to advance
+  useEffect(() => {
+    if (done) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selected) {
+        const num = parseInt(e.key)
+        if (num >= 1 && num <= current.options.length) {
+          const opt = current.options[num - 1]
+          const label = current.showDef ? opt.term : opt.definition
+          handleSelect(label)
+        }
+      } else {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleNext()
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [done, selected, current, handleSelect, handleNext])
+
   if (done) {
     const pct = Math.round((score / total) * 100)
     return (
@@ -228,7 +255,7 @@ function TermDrill({ terms, allTerms, onBack, onCorrect, onMistake }: TermDrillP
             </div>
           )}
           {selected && (
-            <button className="next-btn" onClick={() => { setSelected(null); setIdx(i => i + 1) }}>
+            <button className="next-btn" onClick={handleNext}>
               {'次の問題 →'}
             </button>
           )}
@@ -266,6 +293,31 @@ function PatternDrill({ patterns, onBack, onCorrect, onMistake }: PatternDrillPr
       onMistake(current.id)
     }
   }, [selected, current, onCorrect, onMistake])
+
+  const handleNext = useCallback(() => {
+    setSelected(null)
+    setIdx(i => i + 1)
+  }, [])
+
+  // Keyboard shortcuts: 1-4 to select, Enter/Space to advance
+  useEffect(() => {
+    if (done) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selected) {
+        const num = parseInt(e.key)
+        if (num >= 1 && num <= current.shuffledOptions.length) {
+          handleSelect(current.shuffledOptions[num - 1])
+        }
+      } else {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleNext()
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [done, selected, current, handleSelect, handleNext])
 
   if (done) {
     const pct = Math.round((score / total) * 100)
@@ -306,7 +358,7 @@ function PatternDrill({ patterns, onBack, onCorrect, onMistake }: PatternDrillPr
             </div>
           )}
           {selected && (
-            <button className="next-btn" onClick={() => { setSelected(null); setIdx(i => i + 1) }}>
+            <button className="next-btn" onClick={handleNext}>
               {'次の問題 →'}
             </button>
           )}

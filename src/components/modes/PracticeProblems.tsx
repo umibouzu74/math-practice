@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import type { Problem } from '../../types/index.ts'
+import { shuffle } from '../../utils/shuffle.ts'
 import MathDisplay from '../shared/MathDisplay.tsx'
 import RatingButtons from '../shared/RatingButtons.tsx'
 import CompletionCard from '../shared/CompletionCard.tsx'
@@ -13,15 +14,17 @@ interface PracticeProblemsProps {
 }
 
 export default function PracticeProblems({ problems, onComplete, onMistake, onCorrect }: PracticeProblemsProps) {
+  const [isShuffled, setIsShuffled] = useState(false)
+  const [queue, setQueue] = useState(() => [...problems])
   const [idx, setIdx] = useState(0)
   const [hintsShown, setHintsShown] = useState(0)
   const [showSolution, setShowSolution] = useState(false)
   const [selfRating, setSelfRating] = useState<string | null>(null)
   const [ratings, setRatings] = useState({ good: 0, ok: 0, bad: 0 })
 
-  const total = problems.length
+  const total = queue.length
   const done = idx >= total
-  const current = !done ? problems[idx] : null
+  const current = !done ? queue[idx] : null
   const completedRef = useRef(false)
 
   useEffect(() => {
@@ -29,7 +32,7 @@ export default function PracticeProblems({ problems, onComplete, onMistake, onCo
       completedRef.current = true
       onComplete?.(total, ratings.good, ratings)
     }
-  }, [done])
+  }, [done, total, ratings, onComplete])
 
   const handleRate = useCallback((rating: 'good' | 'ok' | 'bad') => {
     setSelfRating(rating)
@@ -50,13 +53,29 @@ export default function PracticeProblems({ problems, onComplete, onMistake, onCo
     setSelfRating(null)
   }, [])
 
+  const handleToggleShuffle = useCallback(() => {
+    setIsShuffled(prev => {
+      const next = !prev
+      setQueue(next ? shuffle(problems) : [...problems])
+      setIdx(0)
+      setHintsShown(0)
+      setShowSolution(false)
+      setSelfRating(null)
+      setRatings({ good: 0, ok: 0, bad: 0 })
+      completedRef.current = false
+      return next
+    })
+  }, [problems])
+
   const handleReset = useCallback(() => {
+    setQueue(isShuffled ? shuffle(problems) : [...problems])
     setIdx(0)
     setHintsShown(0)
     setShowSolution(false)
     setSelfRating(null)
     setRatings({ good: 0, ok: 0, bad: 0 })
-  }, [])
+    completedRef.current = false
+  }, [problems, isShuffled])
 
   if (done) {
     const totalRated = ratings.good + ratings.ok + ratings.bad
@@ -77,6 +96,15 @@ export default function PracticeProblems({ problems, onComplete, onMistake, onCo
 
   return (
     <div className="fade-in">
+      <div className="shuffle-toggle-row">
+        <button
+          className={`shuffle-toggle-btn ${isShuffled ? 'active' : ''}`}
+          onClick={handleToggleShuffle}
+          aria-label={isShuffled ? 'ランダム順' : '順番通り'}
+        >
+          {isShuffled ? '🔀 ランダム' : '📋 順番通り'}
+        </button>
+      </div>
       <ProgressBar current={idx + 1} total={total} label="練習問題" />
 
       <div className="card">
