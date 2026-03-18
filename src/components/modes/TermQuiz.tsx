@@ -46,14 +46,14 @@ export default function TermQuiz({ terms, onComplete, onMistake, onCorrect }: Te
       completedRef.current = true
       onComplete?.(total, score)
     }
-  }, [done])
+  }, [done, onComplete, total, score])
 
   const isCorrect = useMemo(() => {
     if (!selected || done) return false
     return current.showDef
       ? selected === current.term
       : selected === current.definition
-  }, [selected, done, current, current?.showDef])
+  }, [selected, done, current])
 
   const correctKey = !done
     ? (current.showDef ? current.term : current.definition)
@@ -75,7 +75,7 @@ export default function TermQuiz({ terms, onComplete, onMistake, onCorrect }: Te
         return [...prev, current as Term]
       })
     }
-  }, [selected, current])
+  }, [selected, current, onCorrect, onMistake])
 
   const handleNext = useCallback(() => {
     setSelected(null)
