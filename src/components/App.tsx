@@ -92,6 +92,7 @@ export default function App() {
           formulas={chapterData.formulas}
           terms={chapterData.terms}
           patterns={chapterData.patterns}
+          problems={chapterData.problems}
         />
       case 'formula':
         return chapterData.formulas.length > 0
