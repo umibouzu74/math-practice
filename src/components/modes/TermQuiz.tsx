@@ -16,8 +16,9 @@ interface Question extends Term {
   showDef: boolean;
 }
 
-function generateQuestions(termList: Term[]): Question[] {
-  return shuffle(termList).map(t => {
+function generateQuestions(termList: Term[], shouldShuffle: boolean): Question[] {
+  const ordered = shouldShuffle ? shuffle(termList) : termList
+  return ordered.map(t => {
     const wrong = shuffle(termList.filter(x => x.id !== t.id)).slice(0, 3)
     const options = shuffle([t, ...wrong])
     const showDef = Math.random() > 0.5
@@ -26,10 +27,12 @@ function generateQuestions(termList: Term[]): Question[] {
 }
 
 export default function TermQuiz({ terms, onComplete }: TermQuizProps) {
-  const [questions, setQuestions] = useState(() => generateQuestions(terms))
+  const [isShuffled, setIsShuffled] = useState(true)
+  const [questions, setQuestions] = useState(() => generateQuestions(terms, true))
   const [idx, setIdx] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
   const [score, setScore] = useState(0)
+  const [wrongTerms, setWrongTerms] = useState<Term[]>([])
 
   const current = questions[idx]
   const total = questions.length
@@ -60,7 +63,14 @@ export default function TermQuiz({ terms, onComplete }: TermQuizProps) {
     const correct = current.showDef
       ? value === current.term
       : value === current.definition
-    if (correct) setScore(s => s + 1)
+    if (correct) {
+      setScore(s => s + 1)
+    } else {
+      setWrongTerms(prev => {
+        if (prev.some(t => t.id === current.id)) return prev
+        return [...prev, current as Term]
+      })
+    }
   }, [selected, current])
 
   const handleNext = useCallback(() => {
@@ -68,20 +78,65 @@ export default function TermQuiz({ terms, onComplete }: TermQuizProps) {
     setIdx(i => i + 1)
   }, [])
 
-  const handleReset = useCallback(() => {
-    setQuestions(generateQuestions(terms))
+  // Keyboard shortcuts: 1-4 to select, Enter/Space for next
+  useEffect(() => {
+    if (done) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selected) {
+        const num = parseInt(e.key)
+        if (num >= 1 && num <= current.options.length) {
+          const opt = current.options[num - 1]
+          const value = current.showDef ? opt.term : opt.definition
+          handleSelect(value)
+        }
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        handleNext()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [done, selected, current, handleSelect, handleNext])
+
+  const handleToggleShuffle = useCallback(() => {
+    setIsShuffled(prev => {
+      const next = !prev
+      setQuestions(generateQuestions(terms, next))
+      setIdx(0)
+      setSelected(null)
+      setScore(0)
+      return next
+    })
+  }, [terms])
+
+  const handleRetry = useCallback(() => {
+    setQuestions(generateQuestions(wrongTerms, true))
     setIdx(0)
     setSelected(null)
     setScore(0)
-  }, [terms])
+    setWrongTerms([])
+  }, [wrongTerms])
+
+  const handleReset = useCallback(() => {
+    setQuestions(generateQuestions(terms, isShuffled))
+    setIdx(0)
+    setSelected(null)
+    setScore(0)
+    setWrongTerms([])
+  }, [terms, isShuffled])
 
   if (done) {
     const pct = Math.round((score / total) * 100)
     const icon = pct >= 80 ? '\u{1F3C6}' : pct >= 60 ? '\u{1F44D}' : '\u{1F4DA}'
     return (
       <CompletionCard icon={icon} title={`${score} / ${total} \u6B63\u89E3\uFF08${pct}%\uFF09`}>
-        <button className="next-btn" onClick={handleReset} style={{ maxWidth: 300, margin: '1rem auto 0' }}>
-          {'\u3082\u3046\u4E00\u5EA6\u30C1\u30E3\u30EC\u30F3\u30B8'}
+        {wrongTerms.length > 0 && (
+          <button className="next-btn" onClick={handleRetry} style={{ maxWidth: 300, margin: '0.5rem auto' }}>
+            {'不正解の'} {wrongTerms.length} {'問を復習する'}
+          </button>
+        )}
+        <button className="hint-btn" onClick={handleReset} style={{ marginTop: '0.75rem' }}>
+          {'最初からやり直す'}
         </button>
       </CompletionCard>
     )
@@ -89,6 +144,15 @@ export default function TermQuiz({ terms, onComplete }: TermQuizProps) {
 
   return (
     <div className="fade-in">
+      <div className="shuffle-toggle-row">
+        <button
+          className={`shuffle-toggle-btn ${isShuffled ? 'active' : ''}`}
+          onClick={handleToggleShuffle}
+          aria-label={isShuffled ? 'ランダム順' : '順番通り'}
+        >
+          {isShuffled ? '🔀 ランダム' : '📋 順番通り'}
+        </button>
+      </div>
       <ProgressBar current={idx + 1} total={total} label={`\u6B63\u89E3 ${score}/${idx}`} />
 
       <div className="card">

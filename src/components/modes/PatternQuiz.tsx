@@ -15,18 +15,21 @@ interface Question extends Pattern {
   shuffledOptions: string[];
 }
 
-function generateQuestions(patterns: Pattern[]): Question[] {
-  return shuffle(patterns).map(p => ({
+function generateQuestions(patterns: Pattern[], shouldShuffle: boolean): Question[] {
+  const ordered = shouldShuffle ? shuffle(patterns) : patterns
+  return ordered.map(p => ({
     ...p,
     shuffledOptions: shuffle([...p.options]),
   }))
 }
 
 export default function PatternQuiz({ patterns, onComplete }: PatternQuizProps) {
-  const [questions, setQuestions] = useState(() => generateQuestions(patterns))
+  const [isShuffled, setIsShuffled] = useState(true)
+  const [questions, setQuestions] = useState(() => generateQuestions(patterns, true))
   const [idx, setIdx] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
   const [score, setScore] = useState(0)
+  const [wrongPatterns, setWrongPatterns] = useState<Pattern[]>([])
 
   const current = questions[idx]
   const total = questions.length
@@ -48,7 +51,14 @@ export default function PatternQuiz({ patterns, onComplete }: PatternQuizProps) 
   const handleSelect = useCallback((opt: string) => {
     if (selected) return
     setSelected(opt)
-    if (opt === current.correct) setScore(s => s + 1)
+    if (opt === current.correct) {
+      setScore(s => s + 1)
+    } else {
+      setWrongPatterns(prev => {
+        if (prev.some(p => p.id === current.id)) return prev
+        return [...prev, current as Pattern]
+      })
+    }
   }, [selected, current])
 
   const handleNext = useCallback(() => {
@@ -56,20 +66,63 @@ export default function PatternQuiz({ patterns, onComplete }: PatternQuizProps) 
     setIdx(i => i + 1)
   }, [])
 
-  const handleReset = useCallback(() => {
-    setQuestions(generateQuestions(patterns))
+  // Keyboard shortcuts: 1-4 to select, Enter/Space for next
+  useEffect(() => {
+    if (done) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selected) {
+        const num = parseInt(e.key)
+        if (num >= 1 && num <= current.shuffledOptions.length) {
+          handleSelect(current.shuffledOptions[num - 1])
+        }
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        handleNext()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [done, selected, current, handleSelect, handleNext])
+
+  const handleToggleShuffle = useCallback(() => {
+    setIsShuffled(prev => {
+      const next = !prev
+      setQuestions(generateQuestions(patterns, next))
+      setIdx(0)
+      setSelected(null)
+      setScore(0)
+      return next
+    })
+  }, [patterns])
+
+  const handleRetry = useCallback(() => {
+    setQuestions(generateQuestions(wrongPatterns, true))
     setIdx(0)
     setSelected(null)
     setScore(0)
-  }, [patterns])
+    setWrongPatterns([])
+  }, [wrongPatterns])
+
+  const handleReset = useCallback(() => {
+    setQuestions(generateQuestions(patterns, isShuffled))
+    setIdx(0)
+    setSelected(null)
+    setScore(0)
+    setWrongPatterns([])
+  }, [patterns, isShuffled])
 
   if (done) {
     const pct = Math.round((score / total) * 100)
     const icon = pct >= 80 ? '\u{1F9E0}' : '\u{1F4AA}'
     return (
       <CompletionCard icon={icon} title={`${score} / ${total} 正解（${pct}%）`}>
-        <button className="next-btn" onClick={handleReset} style={{ maxWidth: 300, margin: '1rem auto 0' }}>
-          {'もう一度チャレンジ'}
+        {wrongPatterns.length > 0 && (
+          <button className="next-btn" onClick={handleRetry} style={{ maxWidth: 300, margin: '0.5rem auto' }}>
+            {'不正解の'} {wrongPatterns.length} {'問を復習する'}
+          </button>
+        )}
+        <button className="hint-btn" onClick={handleReset} style={{ marginTop: '0.75rem' }}>
+          {'最初からやり直す'}
         </button>
       </CompletionCard>
     )
@@ -77,6 +130,15 @@ export default function PatternQuiz({ patterns, onComplete }: PatternQuizProps) 
 
   return (
     <div className="fade-in">
+      <div className="shuffle-toggle-row">
+        <button
+          className={`shuffle-toggle-btn ${isShuffled ? 'active' : ''}`}
+          onClick={handleToggleShuffle}
+          aria-label={isShuffled ? 'ランダム順' : '順番通り'}
+        >
+          {isShuffled ? '🔀 ランダム' : '📋 順番通り'}
+        </button>
+      </div>
       <ProgressBar current={idx + 1} total={total} label={`正解 ${score}/${idx}`} />
 
       <div className="card">

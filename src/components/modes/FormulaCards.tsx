@@ -14,6 +14,7 @@ interface FormulaCardsProps {
 type Rating = 'good' | 'ok' | 'bad'
 
 export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps) {
+  const [isShuffled, setIsShuffled] = useState(true)
   const [queue, setQueue] = useState(() => shuffle(formulas))
   const [idx, setIdx] = useState(0)
   const [flipped, setFlipped] = useState(false)
@@ -48,13 +49,45 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
     setStats({ good: 0, ok: 0, bad: 0 })
   }, [retryQueue])
 
+  const handleToggleShuffle = useCallback(() => {
+    setIsShuffled(prev => {
+      const next = !prev
+      setQueue(next ? shuffle(formulas) : [...formulas])
+      setIdx(0)
+      setFlipped(false)
+      setStats({ good: 0, ok: 0, bad: 0 })
+      setRetryQueue([])
+      return next
+    })
+  }, [formulas])
+
   const handleReset = useCallback(() => {
-    setQueue(shuffle(formulas))
+    setQueue(isShuffled ? shuffle(formulas) : [...formulas])
     setIdx(0)
     setFlipped(false)
     setStats({ good: 0, ok: 0, bad: 0 })
     setRetryQueue([])
-  }, [formulas])
+  }, [formulas, isShuffled])
+
+  // Keyboard shortcuts: Space to flip, 1/2/3 for ○△×
+  useEffect(() => {
+    if (done) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault()
+        if (!flipped) {
+          setFlipped(true)
+        }
+      }
+      if (flipped) {
+        if (e.key === '1') handleRate('good')
+        else if (e.key === '2') handleRate('ok')
+        else if (e.key === '3') handleRate('bad')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [done, flipped, handleRate])
 
   if (done) {
     return (
@@ -78,9 +111,18 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
 
   return (
     <div className="fade-in">
+      <div className="shuffle-toggle-row">
+        <button
+          className={`shuffle-toggle-btn ${isShuffled ? 'active' : ''}`}
+          onClick={handleToggleShuffle}
+          aria-label={isShuffled ? 'ランダム順' : '順番通り'}
+        >
+          {isShuffled ? '🔀 ランダム' : '📋 順番通り'}
+        </button>
+      </div>
       <ProgressBar current={idx + 1} total={total} label={current.category} />
 
-      <div className="flashcard-container" onClick={() => setFlipped(f => !f)}>
+      <div className="flashcard-container" onClick={() => setFlipped(f => !f)} role="button" tabIndex={0} aria-label="公式カードをめくる">
         <div className={`flashcard ${flipped ? 'flipped' : ''}`}>
           {/* Front */}
           <div className="flashcard-face">
@@ -91,7 +133,7 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
                 {'\u4F8B'}: <MathDisplay tex={current.example} />
               </div>
             )}
-            <div className="tap-hint">{'\u30BF\u30C3\u30D7\u3067\u516C\u5F0F\u3092\u8868\u793A'}</div>
+            <div className="tap-hint">{'タップ or スペースキーで公式を表示'}</div>
           </div>
           {/* Back */}
           <div className="flashcard-face flashcard-back">
