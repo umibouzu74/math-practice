@@ -480,6 +480,119 @@ body {
   font-size: 0.88rem;
 }
 
+/* Shuffle Toggle */
+.shuffle-toggle-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+.shuffle-toggle-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-light);
+  transition: all 0.15s;
+}
+.shuffle-toggle-btn:hover { background: #f3f0eb; }
+.shuffle-toggle-btn.active {
+  border-color: var(--accent2);
+  color: var(--accent2);
+  background: var(--accent2-light);
+}
+
+/* Dashboard */
+.dashboard-mode-row {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.dashboard-mode-row:last-child { border-bottom: none; }
+.dashboard-mode-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.dashboard-mode-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--ink-light);
+}
+.dashboard-mode-bar-container {
+  flex: 1;
+  height: 6px;
+  background: #e5e0d8;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.dashboard-mode-bar {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), #7c3aed);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.dashboard-history {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.dashboard-history-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+}
+.dashboard-history-item:last-child { border-bottom: none; }
+.dashboard-history-date {
+  color: var(--ink-light);
+  font-size: 0.75rem;
+  min-width: 5.5em;
+}
+.dashboard-history-mode {
+  font-weight: 600;
+  min-width: 5em;
+}
+.dashboard-history-result {
+  margin-left: auto;
+  font-size: 0.78rem;
+}
+
+/* Accessibility: Focus */
+.quiz-option:focus-visible,
+.rating-btn:focus-visible,
+.next-btn:focus-visible,
+.hint-btn:focus-visible,
+.tab:focus-visible,
+.shuffle-toggle-btn:focus-visible {
+  outline: 2px solid var(--accent2);
+  outline-offset: 2px;
+}
+
+/* Key hints */
+.option-key-hint {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--ink-light);
+  opacity: 0.5;
+  line-height: 1;
+  margin-top: 1px;
+}
+.rating-key-hint {
+  display: block;
+  font-size: 0.6rem;
+  color: inherit;
+  opacity: 0.4;
+  margin-top: 2px;
+}
+
 /* Animations */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(8px); }
