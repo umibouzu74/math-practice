@@ -2,39 +2,6 @@ import { useState } from 'react'
 import type { Formula, Term, Pattern, Problem } from '../../types/index.ts'
 import MathDisplay from '../shared/MathDisplay.tsx'
 
-interface ReferenceViewProps {
-  formulas: Formula[]
-  terms: Term[]
-  patterns: Pattern[]
-  problems: Problem[]
-}
-
-function AccordionSection({
-  icon,
-  title,
-  defaultOpen = true,
-  children,
-}: {
-  icon: string
-  title: string
-  defaultOpen?: boolean
-  children: React.ReactNode
-}) {
-  const [open, setOpen] = useState(defaultOpen)
-
-  return (
-    <div className="card ref-section">
-      <button className="ref-section-header" onClick={() => setOpen(o => !o)}>
-        <span className="ref-section-title">
-          <span>{icon}</span> {title}
-        </span>
-        <span className={`ref-chevron ${open ? 'open' : ''}`}>&#9662;</span>
-      </button>
-      {open && <div className="ref-section-body">{children}</div>}
-    </div>
-  )
-}
-
 function groupByCategory(formulas: Formula[]): Record<string, Formula[]> {
   const groups: Record<string, Formula[]> = {}
   for (const f of formulas) {
@@ -65,7 +32,7 @@ function ExpandableSolution({ problem }: { problem: Problem }) {
             <div className="ref-solution-hints">
               {problem.hints.map((hint, i) => (
                 <div key={i} className="ref-solution-hint">
-                  {'💡 ヒント'}{i + 1}{'：'}<MathDisplay tex={hint} />
+                  {'ヒント'}{i + 1}{'：'}<MathDisplay tex={hint} />
                 </div>
               ))}
             </div>
@@ -86,13 +53,12 @@ function ExpandableSolution({ problem }: { problem: Problem }) {
   )
 }
 
-export default function ReferenceView({ formulas, terms, patterns, problems }: ReferenceViewProps) {
+export function FormulaReference({ formulas }: { formulas: Formula[] }) {
   const formulaGroups = groupByCategory(formulas)
 
   return (
-    <div className="fade-in">
-      {/* Section 1: 公式一覧 */}
-      <AccordionSection icon="\u{1F4D0}" title="公式一覧">
+    <div className="card ref-section">
+      <div className="ref-section-body" style={{ paddingTop: '1.2rem' }}>
         {Object.entries(formulaGroups).map(([category, items]) => (
           <div key={category} className="ref-group">
             <div className="ref-group-label">{category}</div>
@@ -103,7 +69,7 @@ export default function ReferenceView({ formulas, terms, patterns, problems }: R
                   <MathDisplay tex={f.formula} display />
                 </div>
                 {f.note && (
-                  <div className="ref-item-note">{'\u{1F4A1}'} {f.note}</div>
+                  <div className="ref-item-note">{f.note}</div>
                 )}
                 {f.example && (
                   <div className="ref-item-example">
@@ -117,10 +83,15 @@ export default function ReferenceView({ formulas, terms, patterns, problems }: R
         {formulas.length === 0 && (
           <div className="ref-empty">データがありません</div>
         )}
-      </AccordionSection>
+      </div>
+    </div>
+  )
+}
 
-      {/* Section 2: 用語一覧 */}
-      <AccordionSection icon="\u{1F4D6}" title="用語一覧">
+export function TermReference({ terms }: { terms: Term[] }) {
+  return (
+    <div className="card ref-section">
+      <div className="ref-section-body" style={{ paddingTop: '1.2rem' }}>
         {terms.map(t => (
           <div key={t.id} className="ref-item">
             <div className="ref-item-name">{t.term}</div>
@@ -135,10 +106,15 @@ export default function ReferenceView({ formulas, terms, patterns, problems }: R
         {terms.length === 0 && (
           <div className="ref-empty">データがありません</div>
         )}
-      </AccordionSection>
+      </div>
+    </div>
+  )
+}
 
-      {/* Section 3: 解法パターン一覧 */}
-      <AccordionSection icon="\u{1F9E9}" title="解法パターン一覧">
+export function PatternReference({ patterns }: { patterns: Pattern[] }) {
+  return (
+    <div className="card ref-section">
+      <div className="ref-section-body" style={{ paddingTop: '1.2rem' }}>
         {patterns.map(p => (
           <div key={p.id} className="ref-item">
             <div className="ref-item-problem">
@@ -152,17 +128,22 @@ export default function ReferenceView({ formulas, terms, patterns, problems }: R
         {patterns.length === 0 && (
           <div className="ref-empty">データがありません</div>
         )}
-      </AccordionSection>
+      </div>
+    </div>
+  )
+}
 
-      {/* Section 4: 練習問題一覧 */}
-      <AccordionSection icon={'\u270F\uFE0F'} title="練習問題一覧" defaultOpen={false}>
+export function PracticeReference({ problems }: { problems: Problem[] }) {
+  return (
+    <div className="card ref-section">
+      <div className="ref-section-body" style={{ paddingTop: '1.2rem' }}>
         {problems.map(p => (
           <ExpandableSolution key={p.id} problem={p} />
         ))}
         {problems.length === 0 && (
           <div className="ref-empty">データがありません</div>
         )}
-      </AccordionSection>
+      </div>
     </div>
   )
 }

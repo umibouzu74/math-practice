@@ -26,7 +26,7 @@ function formatDate(iso: string): string {
 
 export default function StudyDashboard({ records, chapters, currentChapterId, onClearRecords }: StudyDashboardProps) {
   const chapterRecords = useMemo(
-    () => records.filter(r => r.chapterId === currentChapterId && r.mode !== 'reference' && r.mode !== 'dashboard'),
+    () => records.filter(r => r.chapterId === currentChapterId && r.mode !== 'dashboard'),
     [records, currentChapterId]
   )
 
@@ -64,7 +64,7 @@ export default function StudyDashboard({ records, chapters, currentChapterId, on
           </div>
           <div className="stats-row">
             <span className="stat-chip blue">{'学習日数'} {studyDays}</span>
-            <span className="stat-chip blue">{'総セッション'} {records.filter(r => r.mode !== 'reference' && r.mode !== 'dashboard').length}</span>
+            <span className="stat-chip blue">{'総セッション'} {records.filter(r => r.mode !== 'dashboard').length}</span>
           </div>
         </div>
       </div>

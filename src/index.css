@@ -128,19 +128,24 @@ body {
   background: rgba(0,0,0,0.5);
   z-index: 200;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
+  padding: 1.5rem;
   animation: fadeIn 0.2s ease;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .chapter-modal {
   background: var(--bg-card);
-  border-radius: 20px 20px 0 0;
+  border-radius: 16px;
   width: 100%;
-  max-width: 500px;
-  max-height: 85vh;
+  max-width: 420px;
+  max-height: 70vh;
   overflow-y: auto;
-  animation: slideUp 0.3s ease;
+  animation: modalPopIn 0.25s ease;
+}
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 .chapter-modal-header {
   display: flex;
@@ -540,6 +545,24 @@ body {
 }
 .complete-icon { font-size: 3rem; margin-bottom: 1rem; }
 .complete-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+
+/* Reference Toggle Button */
+.ref-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--accent2);
+  background: transparent;
+  color: var(--accent2);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.15s;
+  margin-bottom: 0.75rem;
+}
+.ref-toggle-btn:hover { background: var(--accent2-light); }
 
 /* Reference View */
 .ref-section { margin-bottom: 1rem; overflow: hidden; }
