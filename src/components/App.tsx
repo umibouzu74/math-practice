@@ -7,7 +7,7 @@ import FormulaCards from './modes/FormulaCards.tsx'
 import TermQuiz from './modes/TermQuiz.tsx'
 import PatternQuiz from './modes/PatternQuiz.tsx'
 import PracticeProblems from './modes/PracticeProblems.tsx'
-import ReferenceView from './modes/ReferenceView.tsx'
+import { FormulaReference, TermReference, PatternReference, PracticeReference } from './modes/ReferenceView.tsx'
 import StudyDashboard from './modes/StudyDashboard.tsx'
 import MistakeNote from './modes/MistakeNote.tsx'
 import CrossReview from './modes/CrossReview.tsx'
@@ -28,7 +28,8 @@ const chapterDataMap: Record<string, ChapterData> = {
 
 export default function App() {
   const [chapterId, setChapterId] = useState(chapters[0].id)
-  const [mode, setMode] = useState<Mode>('reference')
+  const [mode, setMode] = useState<Mode>('formula')
+  const [showRef, setShowRef] = useState(false)
   const [records, setRecords] = useLocalStorage<StudyRecord[]>('math-master-records', [])
   const [mistakes, setMistakes] = useLocalStorage<MistakeEntry[]>('math-master-mistakes', [])
   const mainRef = useRef<HTMLElement>(null)
@@ -38,6 +39,7 @@ export default function App() {
     setTransitioning(true)
     setTimeout(() => {
       setMode(newMode)
+      setShowRef(false)
       window.scrollTo({ top: 0 })
       setTransitioning(false)
     }, 150)
@@ -84,43 +86,48 @@ export default function App() {
     setChapterId(id)
   }
 
+  const renderRefToggle = () => (
+    <button
+      className="ref-toggle-btn"
+      onClick={() => { setShowRef(r => !r); if (!showRef) window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+    >
+      {showRef ? '学習に戻る' : '一覧を見る'}
+    </button>
+  )
+
   const renderMode = () => {
     switch (mode) {
-      case 'reference':
-        return <ReferenceView
-          key={`ref-${chapterId}`}
-          formulas={chapterData.formulas}
-          terms={chapterData.terms}
-          patterns={chapterData.patterns}
-          problems={chapterData.problems}
-        />
       case 'formula':
+        if (showRef) return <div className="fade-in">{renderRefToggle()}<FormulaReference formulas={chapterData.formulas} /></div>
         return chapterData.formulas.length > 0
-          ? <FormulaCards key={`f-${chapterId}`} formulas={chapterData.formulas}
+          ? <div>{renderRefToggle()}<FormulaCards key={`f-${chapterId}`} formulas={chapterData.formulas}
               onComplete={(total, correct, ratings) => saveRecord('formula', total, correct, ratings)}
               onMistake={(id) => saveMistake('formula', id)}
-              onCorrect={(id) => removeMistake('formula', id)} />
+              onCorrect={(id) => removeMistake('formula', id)} /></div>
           : <EmptyState />
       case 'term':
+        if (showRef) return <div className="fade-in">{renderRefToggle()}<TermReference terms={chapterData.terms} /></div>
         return chapterData.terms.length > 0
-          ? <TermQuiz key={`t-${chapterId}`} terms={chapterData.terms}
+          ? <div>{renderRefToggle()}<TermQuiz key={`t-${chapterId}`} terms={chapterData.terms}
               onComplete={(total, correct) => saveRecord('term', total, correct)}
               onMistake={(id) => saveMistake('term', id)}
-              onCorrect={(id) => removeMistake('term', id)} />
+              onCorrect={(id) => removeMistake('term', id)} /></div>
           : <EmptyState />
       case 'pattern':
+        if (showRef) return <div className="fade-in">{renderRefToggle()}<PatternReference patterns={chapterData.patterns} /></div>
         return chapterData.patterns.length > 0
-          ? <PatternQuiz key={`p-${chapterId}`} patterns={chapterData.patterns}
+          ? <div>{renderRefToggle()}<PatternQuiz key={`p-${chapterId}`} patterns={chapterData.patterns}
               onComplete={(total, correct) => saveRecord('pattern', total, correct)}
               onMistake={(id) => saveMistake('pattern', id)}
-              onCorrect={(id) => removeMistake('pattern', id)} />
+              onCorrect={(id) => removeMistake('pattern', id)} /></div>
           : <EmptyState />
       case 'practice':
+        if (showRef) return <div className="fade-in">{renderRefToggle()}<PracticeReference problems={chapterData.problems} /></div>
         return chapterData.problems.length > 0
-          ? <PracticeProblems key={`pr-${chapterId}`} problems={chapterData.problems}
+          ? <div>{renderRefToggle()}<PracticeProblems key={`pr-${chapterId}`} problems={chapterData.problems}
               onComplete={(total, correct, ratings) => saveRecord('practice', total, correct, ratings)}
               onMistake={(id) => saveMistake('practice', id)}
-              onCorrect={(id) => removeMistake('practice', id)} />
+              onCorrect={(id) => removeMistake('practice', id)} /></div>
           : <EmptyState />
       case 'mistakes':
         return <MistakeNote

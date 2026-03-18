@@ -67,4 +67,4 @@ export interface MistakeEntry {
   count: number;
 }
 
-export type Mode = 'reference' | 'formula' | 'term' | 'pattern' | 'practice' | 'mistakes' | 'review' | 'dashboard';
+export type Mode = 'formula' | 'term' | 'pattern' | 'practice' | 'mistakes' | 'review' | 'dashboard';
