@@ -9,6 +9,8 @@ import ProgressBar from '../layout/ProgressBar.tsx'
 interface TermQuizProps {
   terms: Term[];
   onComplete?: (total: number, correct: number) => void;
+  onMistake?: (itemId: string) => void;
+  onCorrect?: (itemId: string) => void;
 }
 
 interface Question extends Term {
@@ -26,7 +28,7 @@ function generateQuestions(termList: Term[], shouldShuffle: boolean): Question[]
   })
 }
 
-export default function TermQuiz({ terms, onComplete }: TermQuizProps) {
+export default function TermQuiz({ terms, onComplete, onMistake, onCorrect }: TermQuizProps) {
   const [isShuffled, setIsShuffled] = useState(true)
   const [questions, setQuestions] = useState(() => generateQuestions(terms, true))
   const [idx, setIdx] = useState(0)
@@ -65,7 +67,9 @@ export default function TermQuiz({ terms, onComplete }: TermQuizProps) {
       : value === current.definition
     if (correct) {
       setScore(s => s + 1)
+      onCorrect?.(current.id)
     } else {
+      onMistake?.(current.id)
       setWrongTerms(prev => {
         if (prev.some(t => t.id === current.id)) return prev
         return [...prev, current as Term]

@@ -9,11 +9,13 @@ import ProgressBar from '../layout/ProgressBar.tsx'
 interface FormulaCardsProps {
   formulas: Formula[];
   onComplete?: (total: number, correct: number, ratings: { good: number; ok: number; bad: number }) => void;
+  onMistake?: (itemId: string) => void;
+  onCorrect?: (itemId: string) => void;
 }
 
 type Rating = 'good' | 'ok' | 'bad'
 
-export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps) {
+export default function FormulaCards({ formulas, onComplete, onMistake, onCorrect }: FormulaCardsProps) {
   const [isShuffled, setIsShuffled] = useState(true)
   const [queue, setQueue] = useState(() => shuffle(formulas))
   const [idx, setIdx] = useState(0)
@@ -51,11 +53,14 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
       // Swipe right → previous card
       setFlipped(false)
       setIdx(i => i - 1)
+    } else if (swipeOffset < -threshold && flipped) {
+      // Swipe left → skip (only when card is flipped, to avoid accidental skips)
+      setFlipped(false)
+      setTimeout(() => setIdx(i => i + 1), 150)
     }
-    // Swipe left to skip is intentionally not provided to avoid accidental skips
     setSwipeOffset(0)
     touchStartRef.current = null
-  }, [swipeOffset, idx])
+  }, [swipeOffset, idx, flipped])
 
   useEffect(() => {
     if (done && !completedRef.current) {
@@ -66,12 +71,15 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
 
   const handleRate = useCallback((rating: Rating) => {
     setStats(s => ({ ...s, [rating]: s[rating] + 1 }))
-    if (rating !== 'good') {
+    if (rating === 'good') {
+      onCorrect?.(current.id)
+    } else {
+      onMistake?.(current.id)
       setRetryQueue(q => [...q, current])
     }
     setFlipped(false)
     setTimeout(() => setIdx(i => i + 1), 150)
-  }, [current])
+  }, [current, onMistake, onCorrect])
 
   const handleRetry = useCallback(() => {
     setQueue(shuffle(retryQueue))
@@ -176,7 +184,7 @@ export default function FormulaCards({ formulas, onComplete }: FormulaCardsProps
                 {'\u4F8B'}: <MathDisplay tex={current.example} />
               </div>
             )}
-            <div className="tap-hint">{'タップで公式を表示 ｜ ← スワイプで戻る'}</div>
+            <div className="tap-hint">{'タップで公式を表示 ｜ ← → スワイプで移動'}</div>
           </div>
           {/* Back */}
           <div className="flashcard-face flashcard-back">
