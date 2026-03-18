@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import type { Chapter, ChapterData, Mode, StudyRecord } from '../types/index.ts'
 import useLocalStorage from '../hooks/useLocalStorage.ts'
 import Header from './layout/Header.tsx'
@@ -29,11 +29,21 @@ export default function App() {
   const [mode, setMode] = useState<Mode>('reference')
   const [records, setRecords] = useLocalStorage<StudyRecord[]>('math-master-records', [])
   const mainRef = useRef<HTMLElement>(null)
+  const [transitioning, setTransitioning] = useState(false)
 
   const handleModeChange = useCallback((newMode: Mode) => {
-    setMode(newMode)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setTransitioning(true)
+    setTimeout(() => {
+      setMode(newMode)
+      window.scrollTo({ top: 0 })
+      setTransitioning(false)
+    }, 150)
   }, [])
+
+  useEffect(() => {
+    // Also reset scroll on chapter change
+    window.scrollTo({ top: 0 })
+  }, [chapterId])
 
   const chapterData = useMemo(() => chapterDataMap[chapterId], [chapterId])
 
@@ -101,7 +111,7 @@ export default function App() {
         onChapterChange={handleChapterChange}
       />
       <ModeTabs activeMode={mode} onModeChange={handleModeChange} />
-      <main className="main" ref={mainRef}>
+      <main className={`main ${transitioning ? 'mode-exit' : 'mode-enter'}`} ref={mainRef}>
         {renderMode()}
       </main>
     </div>
